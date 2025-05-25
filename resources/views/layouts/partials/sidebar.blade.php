@@ -18,11 +18,18 @@
             <span class="hide-menu">Home</span>
           </li>
           <li class="sidebar-item">
-            <a class="sidebar-link" href="./index.html" aria-expanded="false">
+            <a class="sidebar-link" href="{{ route('dashboard') }}" aria-expanded="false">
               <i class="ti ti-atom"></i>
               <span class="hide-menu">Dashboard</span>
             </a>
           </li>
+          <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ route('users.index') }}" aria-expanded="false">
+              <i class="ti ti-users"></i>
+              <span class="hide-menu">Manajemen User</span>
+            </a>
+          </li>
+          
          
         </ul>
       </nav>
