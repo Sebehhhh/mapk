@@ -14,16 +14,15 @@
   <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
     data-sidebar-position="fixed" data-header-position="fixed">
 
-    @include('layouts.partials.topstrip')
-
+    {{-- @include('layouts.partials.topstrip') --}}
+    
     @include('layouts.partials.sidebar')
     <!--  Main wrapper -->
     <div class="body-wrapper">
-      @include('layouts.partials.header')
       <div class="body-wrapper-inner">
+        @include('layouts.partials.header')
         <div class="container-fluid">
           @yield('content')
-
           @include('layouts.partials.footer')
         </div>
       </div>

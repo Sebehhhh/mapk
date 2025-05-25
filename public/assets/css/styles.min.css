@@ -15931,19 +15931,16 @@ body {
 
 #main-wrapper[data-layout=vertical][data-sidebar-position=fixed] .left-sidebar {
   position: fixed;
-  top: 65px;
+  top: 0;
 }
 @media (max-width: 991.98px) {
   #main-wrapper[data-layout=vertical][data-sidebar-position=fixed] .left-sidebar {
-    top: 131px;
+    top: 0;
   }
 }
 #main-wrapper[data-layout=vertical][data-header-position=fixed] .app-header {
   position: fixed;
   z-index: 10;
-}
-#main-wrapper[data-layout=vertical][data-header-position=fixed] .body-wrapper > .container-fluid, #main-wrapper[data-layout=vertical][data-header-position=fixed] .body-wrapper > .container-sm, #main-wrapper[data-layout=vertical][data-header-position=fixed] .body-wrapper > .container-md, #main-wrapper[data-layout=vertical][data-header-position=fixed] .body-wrapper > .container-lg, #main-wrapper[data-layout=vertical][data-header-position=fixed] .body-wrapper > .container-xl, #main-wrapper[data-layout=vertical][data-header-position=fixed] .body-wrapper > .container-xxl {
-  padding-top: calc(70px + 30px);
 }
 
 @media (min-width: 1200px) {
