@@ -7,6 +7,9 @@
   <title>Login Sistem Informasi Akademik MAPK NU Haruyan</title>
   <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/logos/favicon.png') }}" />
   <link rel="stylesheet" href="{{ asset('assets/css/styles.min.css') }}" />
+
+  {{-- SweetAlert2 CDN --}}
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -34,9 +37,9 @@
                     <label for="email" class="form-label">Email</label>
                     <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
                     @error('email')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
+                      <div class="invalid-feedback">
+                        {{ $message }}
+                      </div>
                     @enderror
                   </div>
 
@@ -45,13 +48,13 @@
                     <label for="password" class="form-label">Password</label>
                     <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" required autocomplete="current-password">
                     @error('password')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
+                      <div class="invalid-feedback">
+                        {{ $message }}
+                      </div>
                     @enderror
                   </div>
 
-                  {{-- Remember Me & Lupa Password (Lupa password dinonaktifkan sementara) --}}
+                  {{-- Remember Me --}}
                   <div class="d-flex align-items-center justify-content-between mb-4">
                     <div class="form-check">
                       <input class="form-check-input primary" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
@@ -65,10 +68,9 @@
                   {{-- Tombol Sign In --}}
                   <button type="submit" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Masuk</button>
 
-                  {{-- Teks untuk pendaftaran (dinonaktifkan karena admin yang mendaftarkan) --}}
+                  {{-- Teks Tambahan --}}
                   <div class="d-flex align-items-center justify-content-center">
                     <p class="fs-4 mb-0 fw-bold">Belum punya akun?</p>
-                    {{-- Ganti dengan instruksi atau kontak admin jika diperlukan --}}
                     <span class="ms-2">Hubungi Admin</span>
                   </div>
                 </form>
@@ -79,9 +81,23 @@
       </div>
     </div>
   </div>
+
   <script src="{{ asset('assets/libs/jquery/dist/jquery.min.js') }}"></script>
   <script src="{{ asset('assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+
+  {{-- SweetAlert Script --}}
+  <script>
+    @if (session('status'))
+      Swal.fire({
+        icon: 'success',
+        title: 'Sukses',
+        text: "{{ session('status') }}",
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'OK'
+      });
+    @endif
+  </script>
 </body>
 
 </html>
