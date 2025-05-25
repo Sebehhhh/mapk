@@ -17,7 +17,8 @@
             <thead>
               <tr>
                 <th>No</th>
-                <th>Nama User</th>
+                <th>NISN</th>
+                <th>Nama Siswa</th>
                 <th>Aksi</th>
               </tr>
             </thead>
@@ -25,6 +26,7 @@
               @foreach($students as $student)
               <tr>
                 <td>{{ $loop->iteration }}</td>
+                <td>{{ $student->nisn }}</td>
                 <td>{{ $student->user->name }}</td>
                 <td>
                   <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#showStudentModal{{ $student->id }}">Detail</button>
