@@ -17,6 +17,16 @@ class Student extends Model
         'address',
         'birth_date',
         'phone',
+        'place_of_birth',
+        'religion',
+        'province',
+        'district',
+        'sub_district',
+        'village',
+        'origin_school_name',
+        'origin_school_address',
+        'graduation_year',
+        'photo',
     ];
 
     /**
@@ -41,5 +51,13 @@ class Student extends Model
     public function examCards()
     {
         return $this->hasMany(ExamCard::class);
+    }
+
+    /**
+     * Relasi ke data orang tua siswa.
+     */
+    public function parent()
+    {
+        return $this->hasOne(StudentParent::class);
     }
 }

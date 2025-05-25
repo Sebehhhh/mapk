@@ -18,10 +18,6 @@
               <tr>
                 <th>No</th>
                 <th>Nama User</th>
-                <th>NISN</th>
-                <th>Jenis Kelamin</th>
-                <th>Kelas</th>
-                <th>No. HP</th>
                 <th>Aksi</th>
               </tr>
             </thead>
@@ -30,11 +26,8 @@
               <tr>
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ $student->user->name }}</td>
-                <td>{{ $student->nisn }}</td>
-                <td>{{ $student->gender }}</td>
-                <td>{{ $student->class }}</td>
-                <td>{{ $student->phone }}</td>
                 <td>
+                  <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#showStudentModal{{ $student->id }}">Detail</button>
                   <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editStudentModal{{ $student->id }}">Edit</button>
                   <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ $student->id }})">Hapus</button>
                 </td>
@@ -96,12 +89,128 @@
           <label>No. HP</label>
           <input type="text" name="phone" class="form-control" value="{{ $student->phone }}">
         </div>
+        <div class="mb-3">
+          <label>Tempat Lahir</label>
+          <input type="text" name="place_of_birth" class="form-control" value="{{ $student->place_of_birth }}">
+        </div>
+        <div class="mb-3">
+          <label>Agama</label>
+          <input type="text" name="religion" class="form-control" value="{{ $student->religion }}">
+        </div>
+        <div class="mb-3">
+          <label>Provinsi</label>
+          <input type="text" name="province" class="form-control" value="{{ $student->province }}">
+        </div>
+        <div class="mb-3">
+          <label>Kabupaten</label>
+          <input type="text" name="district" class="form-control" value="{{ $student->district }}">
+        </div>
+        <div class="mb-3">
+          <label>Kecamatan</label>
+          <input type="text" name="sub_district" class="form-control" value="{{ $student->sub_district }}">
+        </div>
+        <div class="mb-3">
+          <label>Kelurahan</label>
+          <input type="text" name="village" class="form-control" value="{{ $student->village }}">
+        </div>
+        <div class="mb-3">
+          <label>Asal Sekolah</label>
+          <input type="text" name="origin_school_name" class="form-control" value="{{ $student->origin_school_name }}">
+        </div>
+        <div class="mb-3">
+          <label>Alamat Sekolah</label>
+          <textarea name="origin_school_address" class="form-control">{{ $student->origin_school_address }}</textarea>
+        </div>
+        <div class="mb-3">
+          <label>Tahun Lulus</label>
+          <input type="text" name="graduation_year" class="form-control" value="{{ $student->graduation_year }}">
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
         <button type="submit" class="btn btn-success">Update</button>
       </div>
     </form>
+  </div>
+</div>
+
+<div class="modal fade" id="showStudentModal{{ $student->id }}" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Detail Siswa</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label>Nama</label>
+          <input type="text" class="form-control" value="{{ $student->user->name }}" disabled>
+        </div>
+        <div class="mb-3">
+          <label>NISN</label>
+          <input type="text" class="form-control" value="{{ $student->nisn }}" disabled>
+        </div>
+        <div class="mb-3">
+          <label>Jenis Kelamin</label>
+          <input type="text" class="form-control" value="{{ $student->gender }}" disabled>
+        </div>
+        <div class="mb-3">
+          <label>Kelas</label>
+          <input type="text" class="form-control" value="{{ $student->class }}" disabled>
+        </div>
+        <div class="mb-3">
+          <label>Alamat</label>
+          <textarea class="form-control" disabled>{{ $student->address }}</textarea>
+        </div>
+        <div class="mb-3">
+          <label>Tanggal Lahir</label>
+          <input type="text" class="form-control" value="{{ $student->birth_date }}" disabled>
+        </div>
+        <div class="mb-3">
+          <label>No. HP</label>
+          <input type="text" class="form-control" value="{{ $student->phone }}" disabled>
+        </div>
+        <div class="mb-3">
+          <label>Tempat Lahir</label>
+          <input type="text" class="form-control" value="{{ $student->place_of_birth }}" disabled>
+        </div>
+        <div class="mb-3">
+          <label>Agama</label>
+          <input type="text" class="form-control" value="{{ $student->religion }}" disabled>
+        </div>
+        <div class="mb-3">
+          <label>Provinsi</label>
+          <input type="text" class="form-control" value="{{ $student->province }}" disabled>
+        </div>
+        <div class="mb-3">
+          <label>Kabupaten</label>
+          <input type="text" class="form-control" value="{{ $student->district }}" disabled>
+        </div>
+        <div class="mb-3">
+          <label>Kecamatan</label>
+          <input type="text" class="form-control" value="{{ $student->sub_district }}" disabled>
+        </div>
+        <div class="mb-3">
+          <label>Kelurahan</label>
+          <input type="text" class="form-control" value="{{ $student->village }}" disabled>
+        </div>
+        <div class="mb-3">
+          <label>Asal Sekolah</label>
+          <input type="text" class="form-control" value="{{ $student->origin_school_name }}" disabled>
+        </div>
+        <div class="mb-3">
+          <label>Alamat Sekolah</label>
+          <textarea class="form-control" disabled>{{ $student->origin_school_address }}</textarea>
+        </div>
+        <div class="mb-3">
+          <label>Tahun Lulus</label>
+          <input type="text" class="form-control" value="{{ $student->graduation_year }}" disabled>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+      </div>
+    </div>
   </div>
 </div>
 @endforeach
@@ -150,6 +259,42 @@
         <div class="mb-3">
           <label>No. HP</label>
           <input type="text" name="phone" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label>Tempat Lahir</label>
+          <input type="text" name="place_of_birth" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label>Agama</label>
+          <input type="text" name="religion" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label>Provinsi</label>
+          <input type="text" name="province" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label>Kabupaten</label>
+          <input type="text" name="district" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label>Kecamatan</label>
+          <input type="text" name="sub_district" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label>Kelurahan</label>
+          <input type="text" name="village" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label>Asal Sekolah</label>
+          <input type="text" name="origin_school_name" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label>Alamat Sekolah</label>
+          <textarea name="origin_school_address" class="form-control"></textarea>
+        </div>
+        <div class="mb-3">
+          <label>Tahun Lulus</label>
+          <input type="text" name="graduation_year" class="form-control">
         </div>
       </div>
       <div class="modal-footer">
