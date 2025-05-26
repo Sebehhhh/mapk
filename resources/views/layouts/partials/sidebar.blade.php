@@ -35,9 +35,20 @@
 
         <li class="sidebar-item">
           <a class="sidebar-link" href="{{ route('students.index') }}" aria-expanded="false">
-            <i class="ti ti-user-check"></i> <span class="hide-menu">Manajemen Siswa</span>
+            <i class="ti ti-user-check"></i>
+            <span class="hide-menu">Manajemen Siswa</span>
           </a>
         </li>
+
+        {{-- Item Menu untuk Manajemen Mata Pelajaran --}}
+        <li class="sidebar-item">
+          <a class="sidebar-link" href="{{ route('subjects.index') }}" aria-expanded="false">
+            <i class="ti ti-book"></i> {{-- Menggunakan ikon buku --}}
+            <span class="hide-menu">Manajemen Mata Pelajaran</span>
+          </a>
+        </li>
+        {{-- Akhir Item Menu untuk Manajemen Mata Pelajaran --}}
+
       </ul>
     </nav>
   </div>

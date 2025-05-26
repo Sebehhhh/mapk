@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StudentParentController;
+use App\Http\Controllers\SubjectController;
 use Illuminate\Support\Facades\Route;
 
 // Rute Otentikasi
@@ -18,4 +19,5 @@ Route::middleware('auth')->group(function () {
     Route::resource('users', UserController::class);
     Route::resource('students', StudentController::class);
     Route::resource('student-parents', StudentParentController::class);
+    Route::resource('subjects', SubjectController::class); 
 });
