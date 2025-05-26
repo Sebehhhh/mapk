@@ -40,14 +40,19 @@
           </a>
         </li>
 
-        {{-- Item Menu untuk Manajemen Mata Pelajaran --}}
         <li class="sidebar-item">
           <a class="sidebar-link" href="{{ route('subjects.index') }}" aria-expanded="false">
             <i class="ti ti-book"></i> {{-- Menggunakan ikon buku --}}
             <span class="hide-menu">Manajemen Mata Pelajaran</span>
           </a>
         </li>
-        {{-- Akhir Item Menu untuk Manajemen Mata Pelajaran --}}
+        <li class="sidebar-item">
+          <a class="sidebar-link" href="{{ route('scores.index') }}" aria-expanded="false">
+            <i class="ti ti-chart-bar"></i> {{-- Menggunakan ikon chart/grafik --}}
+            <span class="hide-menu">Manajemen Nilai</span>
+          </a>
+        </li>
+
 
       </ul>
     </nav>

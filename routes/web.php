@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ScoreController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StudentParentController;
@@ -20,4 +21,5 @@ Route::middleware('auth')->group(function () {
     Route::resource('students', StudentController::class);
     Route::resource('student-parents', StudentParentController::class);
     Route::resource('subjects', SubjectController::class); 
+    Route::resource('scores', ScoreController::class);
 });
