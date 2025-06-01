@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ExamCard;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ExamCardController extends Controller
 {
@@ -33,6 +34,22 @@ class ExamCardController extends Controller
         ExamCard::create($data);
 
         return redirect()->route('exam-cards.index')->with('success', 'Kartu ujian berhasil ditambahkan.');
+    }
+
+    public function show($id)
+    {
+        $student = Auth::user()->student;
+
+        // Cegah akses jika user mencoba akses data siswa lain
+        if (!$student || $student->id != $id) {
+            abort(403, 'Akses tidak diizinkan.');
+        }
+
+        $examCards = ExamCard::where('student_id', $id)
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('exam-cards.show', compact('student', 'examCards'));
     }
 
     public function update(Request $request, ExamCard $examCard)

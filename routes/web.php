@@ -19,6 +19,12 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Rute Dashboard Umum (admin & siswa bisa akses)
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/student-profile', [ProfileController::class, 'index'])->name('student-profile');
+    Route::get('/student-profile/edit', [ProfileController::class, 'edit'])->name('student-profile.edit');
+    Route::put('/student-profile/update-student', [ProfileController::class, 'updateStudent'])->name('student-profile.update-student');
+    Route::put('/student-profile/update-parent', [ProfileController::class, 'updateParent'])->name('student-profile.update-parent');
+    Route::put('/student-profile/update-user', [ProfileController::class, 'updateUser'])->name('student-profile.update-user');
+    Route::resource('exam-cards', ExamCardController::class);
 });
 
 // Rute Admin Only
@@ -26,18 +32,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('users', UserController::class);
     Route::resource('students', StudentController::class);
     Route::resource('student-parents', StudentParentController::class);
-    Route::resource('subjects', SubjectController::class); 
+    Route::resource('subjects', SubjectController::class);
     Route::resource('scores', ScoreController::class);
-    Route::resource('exam-cards', ExamCardController::class); 
 });
 
 // Rute Siswa (jika perlu nanti)
+
 Route::middleware(['auth', 'role:siswa'])->group(function () {
-    Route::middleware(['auth', 'role:siswa'])->group(function () {
-        Route::get('/student-profile', [ProfileController::class, 'index'])->name('student-profile');
-        Route::get('/student-profile/edit', [ProfileController::class, 'edit'])->name('student-profile.edit');
-        Route::put('/student-profile/update-student', [ProfileController::class, 'updateStudent'])->name('student-profile.update-student');
-        Route::put('/student-profile/update-parent', [ProfileController::class, 'updateParent'])->name('student-profile.update-parent');
-        Route::put('/student-profile/update-user', [ProfileController::class, 'updateUser'])->name('student-profile.update-user');
-    });
+    
 });

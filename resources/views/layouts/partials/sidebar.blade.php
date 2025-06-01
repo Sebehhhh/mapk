@@ -61,6 +61,21 @@
           </li>
         @endif
 
+        @if(auth()->user()->role === 'siswa')
+          <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ route('student-profile') }}" aria-expanded="false">
+              <i class="ti ti-user"></i>
+              <span class="hide-menu">Profil Saya</span>
+            </a>
+          </li>
+          <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ route('exam-cards.show', auth()->user()->student->id) }}" aria-expanded="false">
+              <i class="ti ti-id-badge"></i>
+              <span class="hide-menu">Kartu Ujian</span>
+            </a>
+          </li>
+        @endif
+
       </ul>
     </nav>
   </div>
