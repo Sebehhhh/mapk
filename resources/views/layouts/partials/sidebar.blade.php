@@ -43,7 +43,7 @@
         <li class="sidebar-item">
           <a class="sidebar-link" href="{{ route('subjects.index') }}" aria-expanded="false">
             <i class="ti ti-book"></i> {{-- Menggunakan ikon buku --}}
-            <span class="hide-menu">Manajemen Mata Pelajaran</span>
+            <span class="hide-menu"> Mata Pelajaran</span>
           </a>
         </li>
         <li class="sidebar-item">
@@ -52,7 +52,12 @@
             <span class="hide-menu">Manajemen Nilai</span>
           </a>
         </li>
-
+        <li class="sidebar-item">
+          <a class="sidebar-link" href="{{ route('exam-cards.index') }}" aria-expanded="false">
+            <i class="ti ti-id-badge"></i>
+            <span class="hide-menu">Kartu Ujian</span>
+          </a>
+        </li>
 
       </ul>
     </nav>

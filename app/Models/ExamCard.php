@@ -21,4 +21,10 @@ class ExamCard extends Model
     {
         return $this->belongsTo(Student::class);
     }
+
+    // Accessor untuk menampilkan label status
+    public function getStatusLabelAttribute()
+    {
+        return $this->status == 1 ? 'Aktif' : 'Tidak Aktif';
+    }
 }
