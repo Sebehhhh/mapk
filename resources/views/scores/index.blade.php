@@ -30,7 +30,7 @@
             <thead>
               <tr>
                 <th>No</th>
-                <th>NISN</th>
+                <th>Nama Siswa</th>
                 <th>Mata Pelajaran</th>
                 <th>Semester</th>
                 <th>Level Kelas</th>
@@ -38,8 +38,6 @@
                 <th>Tugas</th>
                 <th>UTS</th>
                 <th>UAS</th>
-                <th>Total Nilai</th>
-                <th>Peringkat</th>
                 <th>Aksi</th>
               </tr>
             </thead>
@@ -47,16 +45,14 @@
               @forelse($scores as $score)
               <tr>
                 <td>{{ $loop->iteration + ($scores->currentPage() - 1) * $scores->perPage() }}</td>
-                <td>{{ $score->student->nisn ?? 'N/A' }}</td> {{-- Mengakses nama siswa --}}
+                <td>{{ $score->student->user->name ?? 'N/A' }}</td> {{-- Mengakses nama siswa --}}
                 <td>{{ $score->subject->name ?? 'N/A' }}</td> {{-- Mengakses nama mata pelajaran --}}
                 <td>{{ $score->semester }}</td>
-                <td>{{ $score->class_level }}</td>
+                <td>{{ $score->subject->class_level }}</td>
                 <td>{{ $score->attendance }}</td>
                 <td>{{ $score->assignment }}</td>
                 <td>{{ $score->mid_exam }}</td>
                 <td>{{ $score->final_exam }}</td>
-                <td>{{ $score->total_score }}</td>
-                <td>{{ $score->rank }}</td>
                 <td>
                   <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
                     data-bs-target="#editScoreModal{{ $score->id }}">Edit</button>
@@ -127,14 +123,6 @@
         <div class="mb-3">
           <label for="final_exam{{ $score->id }}" class="form-label">Nilai UAS</label>
           <input type="number" name="final_exam" class="form-control" id="final_exam{{ $score->id }}" value="{{ $score->final_exam }}" min="0" max="100" required>
-        </div>
-        <div class="mb-3">
-          <label for="total_score{{ $score->id }}" class="form-label">Total Nilai (Otomatis)</label>
-          <input type="number" class="form-control" id="total_score{{ $score->id }}" value="{{ $score->total_score }}" readonly>
-        </div>
-        <div class="mb-3">
-          <label for="rank{{ $score->id }}" class="form-label">Peringkat (Otomatis)</label>
-          <input type="number" class="form-control" id="rank{{ $score->id }}" value="{{ $score->rank }}" readonly>
         </div>
       </div>
       <div class="modal-footer">
