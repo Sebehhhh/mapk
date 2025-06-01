@@ -33,5 +33,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 // Rute Siswa (jika perlu nanti)
 Route::middleware(['auth', 'role:siswa'])->group(function () {
-    Route::get('/student-profile', [ProfileController::class, 'index'])->name('student-profile');
+    Route::middleware(['auth', 'role:siswa'])->group(function () {
+        Route::get('/student-profile', [ProfileController::class, 'index'])->name('student-profile');
+        Route::get('/student-profile/edit', [ProfileController::class, 'edit'])->name('student-profile.edit');
+        Route::put('/student-profile/update-student', [ProfileController::class, 'updateStudent'])->name('student-profile.update-student');
+        Route::put('/student-profile/update-parent', [ProfileController::class, 'updateParent'])->name('student-profile.update-parent');
+        Route::put('/student-profile/update-user', [ProfileController::class, 'updateUser'])->name('student-profile.update-user');
+    });
 });
