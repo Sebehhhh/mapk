@@ -7,7 +7,8 @@
       <div class="card-body">
         <div class="d-md-flex align-items-center justify-content-between">
           <h4 class="card-title">Manajemen Nilai Siswa</h4>
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createScoreModal">Tambah Nilai</button>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createScoreModal">Tambah
+            Nilai</button>
         </div>
 
         {{-- Pesan Sukses/Error --}}
@@ -61,7 +62,7 @@
               </tr>
               @empty
               <tr>
-                  <td colspan="12" class="text-center">Tidak ada data nilai siswa.</td>
+                <td colspan="12" class="text-center">Tidak ada data nilai siswa.</td>
               </tr>
               @endforelse
             </tbody>
@@ -75,7 +76,8 @@
 
 {{-- Modal Edit --}}
 @foreach($scores as $score)
-<div class="modal fade" id="editScoreModal{{ $score->id }}" tabindex="-1" aria-labelledby="editScoreModalLabel{{ $score->id }}" aria-hidden="true">
+<div class="modal fade" id="editScoreModal{{ $score->id }}" tabindex="-1"
+  aria-labelledby="editScoreModalLabel{{ $score->id }}" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <form class="modal-content" method="POST" action="{{ route('scores.update', $score->id) }}">
       @csrf
@@ -91,10 +93,11 @@
             <option value="">Pilih Siswa</option>
             @foreach($students as $student)
             <option value="{{ $student->id }}" {{ $score->student_id == $student->id ? 'selected' : '' }}>
-              {{ $student->nisn }}
+              {{ $student->user->name ?? 'N/A' }} ({{ $student->nisn ?? 'N/A' }})
             </option>
             @endforeach
           </select>
+
         </div>
         <div class="mb-3">
           <label for="subject_id{{ $score->id }}" class="form-label">Mata Pelajaran</label>
@@ -107,22 +110,26 @@
             @endforeach
           </select>
         </div>
-      
+
         <div class="mb-3">
           <label for="attendance{{ $score->id }}" class="form-label">Kehadiran (%)</label>
-          <input type="number" name="attendance" class="form-control" id="attendance{{ $score->id }}" value="{{ $score->attendance }}" min="0" max="100" required>
+          <input type="number" name="attendance" class="form-control" id="attendance{{ $score->id }}"
+            value="{{ $score->attendance }}" min="0" max="100" required>
         </div>
         <div class="mb-3">
           <label for="assignment{{ $score->id }}" class="form-label">Nilai Tugas</label>
-          <input type="number" name="assignment" class="form-control" id="assignment{{ $score->id }}" value="{{ $score->assignment }}" min="0" max="100" required>
+          <input type="number" name="assignment" class="form-control" id="assignment{{ $score->id }}"
+            value="{{ $score->assignment }}" min="0" max="100" required>
         </div>
         <div class="mb-3">
           <label for="mid_exam{{ $score->id }}" class="form-label">Nilai UTS</label>
-          <input type="number" name="mid_exam" class="form-control" id="mid_exam{{ $score->id }}" value="{{ $score->mid_exam }}" min="0" max="100" required>
+          <input type="number" name="mid_exam" class="form-control" id="mid_exam{{ $score->id }}"
+            value="{{ $score->mid_exam }}" min="0" max="100" required>
         </div>
         <div class="mb-3">
           <label for="final_exam{{ $score->id }}" class="form-label">Nilai UAS</label>
-          <input type="number" name="final_exam" class="form-control" id="final_exam{{ $score->id }}" value="{{ $score->final_exam }}" min="0" max="100" required>
+          <input type="number" name="final_exam" class="form-control" id="final_exam{{ $score->id }}"
+            value="{{ $score->final_exam }}" min="0" max="100" required>
         </div>
       </div>
       <div class="modal-footer">
@@ -149,34 +156,40 @@
           <select name="student_id" class="form-control" id="student_id" required>
             <option value="">Pilih Siswa</option>
             @foreach($students as $student)
-            <option value="{{ $student->id }}">{{ $student->nisn }}</option>
+            <option value="{{ $student->id }}">{{ $student->user->name ?? 'N/A' }} ({{ $student->nisn }})</option>
             @endforeach
           </select>
         </div>
+
         <div class="mb-3">
           <label for="subject_id" class="form-label">Mata Pelajaran</label>
           <select name="subject_id" class="form-control" id="subject_id" required>
             <option value="">Pilih Mata Pelajaran</option>
             @foreach($subjects as $subject)
-            <option value="{{ $subject->id }}">{{ $subject->name }} ({{ $subject->class_level }}) - Semester {{ $subject->semester }}</option>
+            <option value="{{ $subject->id }}">{{ $subject->name }} ({{ $subject->class_level }}) - Semester {{
+              $subject->semester }}</option>
             @endforeach
           </select>
         </div>
         <div class="mb-3">
           <label for="attendance" class="form-label">Kehadiran (%)</label>
-          <input type="number" name="attendance" class="form-control" id="attendance" min="0" max="100" placeholder="0-100" required>
+          <input type="number" name="attendance" class="form-control" id="attendance" min="0" max="100"
+            placeholder="0-100" required>
         </div>
         <div class="mb-3">
           <label for="assignment" class="form-label">Nilai Tugas</label>
-          <input type="number" name="assignment" class="form-control" id="assignment" min="0" max="100" placeholder="0-100" required>
+          <input type="number" name="assignment" class="form-control" id="assignment" min="0" max="100"
+            placeholder="0-100" required>
         </div>
         <div class="mb-3">
           <label for="mid_exam" class="form-label">Nilai UTS</label>
-          <input type="number" name="mid_exam" class="form-control" id="mid_exam" min="0" max="100" placeholder="0-100" required>
+          <input type="number" name="mid_exam" class="form-control" id="mid_exam" min="0" max="100" placeholder="0-100"
+            required>
         </div>
         <div class="mb-3">
           <label for="final_exam" class="form-label">Nilai UAS</label>
-          <input type="number" name="final_exam" class="form-control" id="final_exam" min="0" max="100" placeholder="0-100" required>
+          <input type="number" name="final_exam" class="form-control" id="final_exam" min="0" max="100"
+            placeholder="0-100" required>
         </div>
       </div>
       <div class="modal-footer">

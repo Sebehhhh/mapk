@@ -9,7 +9,8 @@
       <div class="card-body">
         <div class="d-md-flex align-items-center justify-content-between">
           <h4 class="card-title">Manajemen Siswa</h4>
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createStudentModal">Tambah Siswa</button>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createStudentModal">Tambah
+            Siswa</button>
         </div>
 
         <div class="table-responsive mt-4">
@@ -29,8 +30,10 @@
                 <td>{{ $student->nisn }}</td>
                 <td>{{ $student->user->name }}</td>
                 <td>
-                  <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#showStudentModal{{ $student->id }}">Detail</button>
-                  <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editStudentModal{{ $student->id }}">Edit</button>
+                  <button class="btn btn-info btn-sm" data-bs-toggle="modal"
+                    data-bs-target="#showStudentModal{{ $student->id }}">Detail</button>
+                  <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                    data-bs-target="#editStudentModal{{ $student->id }}">Edit</button>
                   <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ $student->id }})">Hapus</button>
                 </td>
               </tr>
@@ -60,7 +63,8 @@
           <label>User</label>
           <select name="user_id" class="form-control" required>
             @foreach($users as $user)
-            <option value="{{ $user->id }}" {{ $student->user_id == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+            <option value="{{ $user->id }}" {{ $student->user_id == $user->id ? 'selected' : '' }}>{{ $user->name }}
+            </option>
             @endforeach
           </select>
         </div>
@@ -77,8 +81,13 @@
         </div>
         <div class="mb-3">
           <label>Kelas</label>
-          <input type="text" name="class" class="form-control" value="{{ $student->class }}" required>
+          <select name="class" class="form-select" required>
+            <option value="X" {{ $student->class == 'X' ? 'selected' : '' }}>X</option>
+            <option value="XI" {{ $student->class == 'XI' ? 'selected' : '' }}>XI</option>
+            <option value="XII" {{ $student->class == 'XII' ? 'selected' : '' }}>XII</option>
+          </select>
         </div>
+
         <div class="mb-3">
           <label>Alamat</label>
           <textarea name="address" class="form-control">{{ $student->address }}</textarea>
@@ -248,8 +257,14 @@
         </div>
         <div class="mb-3">
           <label>Kelas</label>
-          <input type="text" name="class" class="form-control" required>
+          <select name="class" class="form-select" required>
+            <option value="" disabled selected>Pilih Kelas</option>
+            <option value="X">X</option>
+            <option value="XI">XI</option>
+            <option value="XII">XII</option>
+          </select>
         </div>
+
         <div class="mb-3">
           <label>Alamat</label>
           <textarea name="address" class="form-control"></textarea>

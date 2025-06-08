@@ -126,6 +126,55 @@ class ScoreController extends Controller
         }
     }
 
+    public function rekap(Request $request)
+    {
+        // Ambil filter kelas & semester (default: XII Genap biar yg terbaru)
+        $kelas = $request->input('kelas', 'XII');
+        $semester = $request->input('semester', 'genap');
+
+        // Ambil semua siswa yg punya nilai di kelas dan semester tsb
+        $students = \App\Models\Student::whereHas('scores', function ($q) use ($kelas, $semester) {
+            $q->where('semester', $semester)
+                ->whereHas('subject', function ($q2) use ($kelas) {
+                    $q2->where('class_level', $kelas);
+                });
+        })->with(['user', 'scores.subject'])->get();
+
+        $rekap = [];
+        foreach ($students as $siswa) {
+            $nilaiAkhir = [];
+            foreach ($siswa->scores as $score) {
+                if ($score->semester == $semester && $score->subject->class_level == $kelas) {
+                    $nilaiAkhir[] =
+                        ($score->attendance * 0.10) +
+                        ($score->assignment * 0.20) +
+                        ($score->mid_exam * 0.30) +
+                        ($score->final_exam * 0.40);
+                }
+            }
+            $avg = count($nilaiAkhir) ? round(array_sum($nilaiAkhir) / count($nilaiAkhir), 2) : 0;
+            $rekap[] = [
+                'siswa' => $siswa,
+                'kelas' => $kelas,
+                'semester' => $semester,
+                'avg' => $avg,
+            ];
+        }
+
+        // Ranking
+        usort($rekap, fn($a, $b) => $b['avg'] <=> $a['avg']);
+        foreach ($rekap as $i => &$row) {
+            $row['rank'] = $i + 1;
+        }
+
+        // Data untuk filter di view (optional, bisa di-hardcode juga)
+        $availableClasses = ['X', 'XI', 'XII'];
+        $availableSemesters = ['ganjil' => 'Ganjil', 'genap' => 'Genap'];
+
+        return view('scores.rekap', compact('rekap', 'kelas', 'semester', 'availableClasses', 'availableSemesters'));
+    }
+
+
     public function studentIndex(Request $request)
     {
         $student = Auth::user()->student;

@@ -34,6 +34,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('student-parents', StudentParentController::class);
     Route::resource('subjects', SubjectController::class);
     Route::resource('scores', ScoreController::class);
+    Route::get('/rekap-ranking', [ScoreController::class, 'rekap'])->name('scores.rekap');
 });
 
 // Rute Siswa (jika perlu nanti)

@@ -59,7 +59,14 @@
             <span class="hide-menu">Kartu Ujian</span>
           </a>
         </li>
+        <li class="sidebar-item">
+          <a class="sidebar-link" href="{{ route('scores.rekap') }}" aria-expanded="false">
+            <i class="ti ti-award"></i>
+            <span class="hide-menu">Rekap Ranking Siswa</span>
+          </a>
+        </li>
         @endif
+
 
         @if(auth()->user()->role === 'siswa')
         <li class="sidebar-item">
