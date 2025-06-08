@@ -39,5 +39,5 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 // Rute Siswa (jika perlu nanti)
 
 Route::middleware(['auth', 'role:siswa'])->group(function () {
-    
+    Route::get('/nilai', [ScoreController::class, 'studentIndex'])->name('student-scores');
 });

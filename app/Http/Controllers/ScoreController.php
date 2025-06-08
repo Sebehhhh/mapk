@@ -6,6 +6,7 @@ use App\Models\Score;
 use App\Models\Student; // Import model Student
 use App\Models\Subject; // Import model Subject
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ScoreController extends Controller
 {
@@ -123,5 +124,67 @@ class ScoreController extends Controller
             // Tangani error jika terjadi
             return redirect()->back()->with('error', 'Gagal menghapus nilai: ' . $e->getMessage());
         }
+    }
+
+    public function studentIndex(Request $request)
+    {
+        $student = Auth::user()->student;
+        if (!$student) {
+            abort(404, 'Siswa tidak ditemukan');
+        }
+
+        // Cari kelas yang dimiliki siswa (ambil dari relasi subject)
+        $allScores = $student->scores()->with('subject')->get();
+
+        // Ambil kelas unik dan urutkan X < XI < XII
+        $classLevels = $allScores->pluck('subject.class_level')->unique()->sort()->values();
+        $semesters = ['ganjil', 'genap']; // statis
+
+        // Tentukan kelas terbesar (XII > XI > X)
+        $kelasTerbaru = $classLevels->contains('XII') ? 'XII' : ($classLevels->contains('XI') ? 'XI' : 'X');
+        // Untuk kelas terbaru, cek semester apa saja
+        $semTerbaru = $allScores->where('subject.class_level', $kelasTerbaru)->pluck('semester')->unique();
+        $semesterDefault = $semTerbaru->contains('genap') ? 'genap' : 'ganjil';
+
+        // Pakai filter dari request atau default
+        $filterKelas = $request->input('kelas', $kelasTerbaru);
+        $filterSemester = $request->input('semester', $semesterDefault);
+
+        // Filter nilai
+        $scores = $allScores
+            ->where('subject.class_level', $filterKelas)
+            ->where('semester', $filterSemester)
+            ->values();
+
+        // Hitung nilai akhir per mapel
+        foreach ($scores as $score) {
+            $score->nilai_akhir = round(
+                ($score->attendance * 0.10) +
+                    ($score->assignment * 0.20) +
+                    ($score->mid_exam * 0.30) +
+                    ($score->final_exam * 0.40),
+                1
+            );
+        }
+
+        $nilai_akhir_rata2 = $scores->count() > 0 ? round($scores->avg('nilai_akhir'), 2) : 0;
+
+        // Ranking — sesuaikan jika sudah punya logika ranking
+        $ranking = null;
+
+        // Data untuk dropdown filter kelas/semester (biar cuma opsi yg ada di data)
+        $availableClasses = ['X', 'XI', 'XII'];
+        $availableSemesters = ['ganjil' => 'Ganjil', 'genap' => 'Genap'];
+
+        return view('student.scores.index', [
+            'scores' => $scores,
+            'student' => $student,
+            'nilai_akhir_rata2' => $nilai_akhir_rata2,
+            'ranking' => $ranking,
+            'filterKelas' => $filterKelas,
+            'filterSemester' => $filterSemester,
+            'availableClasses' => $availableClasses,
+            'availableSemesters' => $availableSemesters,
+        ]);
     }
 }
