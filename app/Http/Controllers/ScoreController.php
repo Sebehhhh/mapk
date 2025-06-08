@@ -182,30 +182,29 @@ class ScoreController extends Controller
             abort(404, 'Siswa tidak ditemukan');
         }
 
-        // Cari kelas yang dimiliki siswa (ambil dari relasi subject)
+        // Semua nilai milik siswa (dengan relasi subject)
         $allScores = $student->scores()->with('subject')->get();
 
-        // Ambil kelas unik dan urutkan X < XI < XII
+        // Data kelas dan semester yang tersedia dari data nilai
         $classLevels = $allScores->pluck('subject.class_level')->unique()->sort()->values();
         $semesters = ['ganjil', 'genap']; // statis
 
-        // Tentukan kelas terbesar (XII > XI > X)
+        // Kelas terbaru (paling tinggi) default
         $kelasTerbaru = $classLevels->contains('XII') ? 'XII' : ($classLevels->contains('XI') ? 'XI' : 'X');
-        // Untuk kelas terbaru, cek semester apa saja
         $semTerbaru = $allScores->where('subject.class_level', $kelasTerbaru)->pluck('semester')->unique();
         $semesterDefault = $semTerbaru->contains('genap') ? 'genap' : 'ganjil';
 
-        // Pakai filter dari request atau default
+        // Ambil filter dari request atau pakai default
         $filterKelas = $request->input('kelas', $kelasTerbaru);
         $filterSemester = $request->input('semester', $semesterDefault);
 
-        // Filter nilai
+        // Filter data nilai yang ditampilkan
         $scores = $allScores
             ->where('subject.class_level', $filterKelas)
             ->where('semester', $filterSemester)
             ->values();
 
-        // Hitung nilai akhir per mapel
+        // Hitung nilai akhir per mapel (sesuai bobot)
         foreach ($scores as $score) {
             $score->nilai_akhir = round(
                 ($score->attendance * 0.10) +
@@ -216,12 +215,52 @@ class ScoreController extends Controller
             );
         }
 
+        // Hitung rata-rata nilai akhir untuk tampilan sendiri
         $nilai_akhir_rata2 = $scores->count() > 0 ? round($scores->avg('nilai_akhir'), 2) : 0;
 
-        // Ranking — sesuaikan jika sudah punya logika ranking
-        $ranking = null;
+        // ---- LOGIKA RANKING START ----
+        // Ambil semua siswa di kelas+semester ini
+        $allStudents = \App\Models\Student::whereHas('scores', function ($q) use ($filterKelas, $filterSemester) {
+            $q->where('semester', $filterSemester)
+                ->whereHas('subject', function ($q2) use ($filterKelas) {
+                    $q2->where('class_level', $filterKelas);
+                });
+        })->with(['scores.subject', 'user'])->get();
 
-        // Data untuk dropdown filter kelas/semester (biar cuma opsi yg ada di data)
+        // Hitung rata-rata nilai akhir setiap siswa di kelas+semester tsb
+        $rankingData = [];
+        foreach ($allStudents as $s) {
+            $studentScores = $s->scores
+                ->where('semester', $filterSemester)
+                ->where('subject.class_level', $filterKelas);
+
+            $nilaiAkhir = $studentScores->map(function ($score) {
+                return ($score->attendance * 0.10) +
+                    ($score->assignment * 0.20) +
+                    ($score->mid_exam * 0.30) +
+                    ($score->final_exam * 0.40);
+            });
+
+            $avg = $nilaiAkhir->count() ? round($nilaiAkhir->avg(), 2) : 0;
+            $rankingData[] = [
+                'student_id' => $s->id,
+                'avg' => $avg
+            ];
+        }
+
+        // Urutkan ranking dan cari ranking siswa yang login
+        usort($rankingData, fn($a, $b) => $b['avg'] <=> $a['avg']);
+
+        $ranking = '-';
+        foreach ($rankingData as $idx => $row) {
+            if ($row['student_id'] == $student->id) {
+                $ranking = $idx + 1;
+                break;
+            }
+        }
+        // ---- LOGIKA RANKING END ----
+
+        // Data filter dropdown
         $availableClasses = ['X', 'XI', 'XII'];
         $availableSemesters = ['ganjil' => 'Ganjil', 'genap' => 'Genap'];
 
