@@ -12,6 +12,15 @@
           <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createStudentModal">Tambah
             Siswa</button>
         </div>
+        @if ($errors->any())
+        <div class="alert alert-danger mb-3">
+          <ul class="mb-0">
+            @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+          </ul>
+        </div>
+        @endif
 
         <div class="table-responsive mt-4">
           <table class="table table-bordered">
@@ -94,8 +103,10 @@
         </div>
         <div class="mb-3">
           <label>Tanggal Lahir</label>
-          <input type="date" name="birth_date" class="form-control" value="{{ $student->birth_date }}">
+          <input type="date" name="birth_date" class="form-control" value="{{ $student->birth_date }}"
+            max="{{ \Carbon\Carbon::now()->subYears(12)->format('Y-m-d') }}" required>
         </div>
+
         <div class="mb-3">
           <label>No. HP</label>
           <input type="text" name="phone" class="form-control" value="{{ $student->phone }}">
@@ -134,7 +145,12 @@
         </div>
         <div class="mb-3">
           <label>Tahun Lulus</label>
-          <input type="text" name="graduation_year" class="form-control" value="{{ $student->graduation_year }}">
+          <select name="graduation_year" class="form-select">
+            @for($year = date('Y'), $min = 1990; $year >= $min; $year--)
+            <option value="{{ $year }}" @if($student->graduation_year == $year) selected @endif>{{ $year }}</option>
+            @endfor
+          </select>
+
         </div>
       </div>
       <div class="modal-footer">
@@ -215,7 +231,7 @@
         </div>
         <div class="mb-3">
           <label>Tahun Lulus</label>
-          <input type="text" class="form-control" value="{{ $student->graduation_year }}" disabled>
+          <input type="date" class="form-control" value="{{ $student->graduation_year }}" disabled>
         </div>
       </div>
       <div class="modal-footer">
@@ -271,8 +287,10 @@
         </div>
         <div class="mb-3">
           <label>Tanggal Lahir</label>
-          <input type="date" name="birth_date" class="form-control">
+          <input type="date" name="birth_date" class="form-control"
+            max="{{ \Carbon\Carbon::now()->subYears(12)->format('Y-m-d') }}" required>
         </div>
+
         <div class="mb-3">
           <label>No. HP</label>
           <input type="text" name="phone" class="form-control">
@@ -311,7 +329,12 @@
         </div>
         <div class="mb-3">
           <label>Tahun Lulus</label>
-          <input type="text" name="graduation_year" class="form-control">
+          <select name="graduation_year" class="form-select">
+            @for($year = date('Y'), $min = 1990; $year >= $min; $year--)
+            <option value="{{ $year }}">{{ $year }}</option>
+            @endfor
+          </select>
+
         </div>
       </div>
       <div class="modal-footer">
