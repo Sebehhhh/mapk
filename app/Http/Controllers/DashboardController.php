@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -14,7 +15,7 @@ class DashboardController extends Controller
         $student = $subjects_count_siswa = $average_score = $ranking = $kelasTerbaru = $semesterTerbaru = $nilaiData = null;
 
         // Ambil role user
-        $role = auth()->user()->role ?? null;
+        $role = Auth::user()->role ?? null;
 
         if ($role === 'admin') {
             // Data statistik admin
@@ -40,7 +41,7 @@ class DashboardController extends Controller
         }
 
         if ($role === 'siswa') {
-            $student = auth()->user()->student;
+            $student = Auth::user()->student;
 
             // Semua skor siswa dengan subject
             $allScores = $student->scores()->with('subject')->get();
