@@ -8,15 +8,16 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Data untuk admin
+        // Set semua variabel awal null biar null-safe di view
         $angkatanLabels = $angkatanData = $genderLabels = $genderData = null;
         $students_count = $users_count = $subjects_count = $student_parents_count = $exam_cards_count = $scores_count = null;
+        $student = $subjects_count_siswa = $average_score = $ranking = $kelasTerbaru = $semesterTerbaru = $nilaiData = null;
 
-        // Data untuk siswa
-        $student = $subjects_count_siswa = $average_score = $latest_exam_card_year = $nilaiData = null;
+        // Ambil role user
+        $role = auth()->user()->role ?? null;
 
-        if (auth()->user()->role === 'admin') {
-            // Statistik angkatan
+        if ($role === 'admin') {
+            // Data statistik admin
             $angkatan = \App\Models\Student::selectRaw('graduation_year, COUNT(*) as total')
                 ->groupBy('graduation_year')
                 ->orderBy('graduation_year', 'asc')
@@ -38,13 +39,13 @@ class DashboardController extends Controller
             $scores_count          = \App\Models\Score::count();
         }
 
-        if (auth()->user()->role === 'siswa') {
+        if ($role === 'siswa') {
             $student = auth()->user()->student;
 
-            // Ambil semua skor siswa (dengan relasi subject)
+            // Semua skor siswa dengan subject
             $allScores = $student->scores()->with('subject')->get();
 
-            // Cek kelas & semester yang tersedia
+            // Cek kelas & semester terakhir
             $classLevels = $allScores->pluck('subject.class_level')->unique()->sort()->values();
             $kelasTerbaru = $classLevels->contains('XII') ? 'XII' : ($classLevels->contains('XI') ? 'XI' : 'X');
             $semTerbaru = $allScores->where('subject.class_level', $kelasTerbaru)->pluck('semester')->unique();
@@ -56,7 +57,7 @@ class DashboardController extends Controller
                 ->where('semester', $semesterTerbaru)
                 ->values();
 
-            // Hitung nilai akhir per mapel (sama seperti di studentIndex)
+            // Hitung nilai akhir per mapel
             foreach ($scores as $score) {
                 $score->nilai_akhir = round(
                     ($score->attendance * 0.10) +
@@ -68,10 +69,10 @@ class DashboardController extends Controller
             }
 
             // Rata-rata nilai akhir
-            $nilai_akhir_rata2 = $scores->count() > 0 ? round($scores->avg('nilai_akhir'), 2) : 0;
-            $subjects_count = $scores->count();
+            $average_score = $scores->count() > 0 ? round($scores->avg('nilai_akhir'), 2) : 0;
+            $subjects_count_siswa = $scores->count();
 
-            // ---- LOGIKA RANKING SAMA SEPERTI DI STUDENTINDEX ----
+            // Logika ranking
             $allStudents = \App\Models\Student::whereHas('scores', function ($q) use ($kelasTerbaru, $semesterTerbaru) {
                 $q->where('semester', $semesterTerbaru)
                     ->whereHas('subject', function ($q2) use ($kelasTerbaru) {
@@ -107,9 +108,8 @@ class DashboardController extends Controller
                     break;
                 }
             }
-            // ------------------------------------------------------
 
-            // Untuk grafik nilai (per semester)
+            // Grafik nilai (per semester)
             $scoresPerSemester = $allScores
                 ->groupBy('semester')
                 ->map(function ($group) {
@@ -123,19 +123,32 @@ class DashboardController extends Controller
 
             $nilaiData = [
                 'labels' => $scoresPerSemester->keys()->toArray(),
-                'data' => $scoresPerSemester->values()->toArray(),
+                'data'   => $scoresPerSemester->values()->toArray(),
             ];
-
-            return view('dashboard.index', [
-                // ...tambahkan data admin jika perlu
-                'student' => $student,
-                'subjects_count_siswa' => $subjects_count,
-                'nilai_akhir_rata2' => $nilai_akhir_rata2,
-                'ranking' => $ranking,
-                'kelasTerbaru' => $kelasTerbaru,
-                'semesterTerbaru' => $semesterTerbaru,
-                'nilaiData' => $nilaiData,
-            ]);
         }
+
+        // Return satu pintu, data lengkap, null-safe
+        return view('dashboard.index', [
+            // Admin
+            'angkatanLabels'        => $angkatanLabels,
+            'angkatanData'          => $angkatanData,
+            'genderLabels'          => $genderLabels,
+            'genderData'            => $genderData,
+            'students_count'        => $students_count,
+            'users_count'           => $users_count,
+            'subjects_count'        => $subjects_count,
+            'student_parents_count' => $student_parents_count,
+            'exam_cards_count'      => $exam_cards_count,
+            'scores_count'          => $scores_count,
+
+            // Siswa
+            'student'               => $student,
+            'subjects_count_siswa'  => $subjects_count_siswa,
+            'nilai_akhir_rata2'     => $average_score,
+            'ranking'               => $ranking,
+            'kelasTerbaru'          => $kelasTerbaru,
+            'semesterTerbaru'       => $semesterTerbaru,
+            'nilaiData'             => $nilaiData,
+        ]);
     }
 }

@@ -102,50 +102,53 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     // Data dikirim dari Controller via JSON
-    var angkatanData = @json($angkatanData);
-    var genderData = @json($genderData);
+    var angkatanLabels = @json($angkatanLabels);
+var angkatanData   = @json($angkatanData);
+var genderLabels   = @json($genderLabels);
+var genderData     = @json($genderData);
 
-    // Chart Angkatan
-    new Chart(document.getElementById('angkatanChart'), {
-      type: 'bar',
-      data: {
-        labels: angkatanData.labels,
-        datasets: [{
-          label: 'Jumlah Siswa',
-          data: angkatanData.data,
-          backgroundColor: 'rgba(24,78,189,0.6)',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, stepSize: 1 } }
-      }
-    });
+// Chart Angkatan
+new Chart(document.getElementById('angkatanChart'), {
+  type: 'bar',
+  data: {
+    labels: angkatanLabels,
+    datasets: [{
+      label: 'Jumlah Siswa',
+      data: angkatanData,
+      backgroundColor: 'rgba(24,78,189,0.6)',
+      borderWidth: 1
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: { y: { beginAtZero: true, stepSize: 1 } }
+  }
+});
 
-    // Chart Gender
-    new Chart(document.getElementById('genderChart'), {
-      type: 'doughnut',
-      data: {
-        labels: genderData.labels,
-        datasets: [{
-          data: genderData.data,
-          backgroundColor: [
-            'rgba(24,78,189,0.6)',
-            'rgba(242,162,24,0.6)'
-          ],
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { position: 'bottom' } }
-      }
-    });
+// Chart Gender
+new Chart(document.getElementById('genderChart'), {
+  type: 'doughnut',
+  data: {
+    labels: genderLabels,
+    datasets: [{
+      data: genderData,
+      backgroundColor: [
+        'rgba(24,78,189,0.6)',
+        'rgba(242,162,24,0.6)'
+      ],
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'bottom' } }
+  }
+});
+
   });
 </script>
 
-@elseif(auth()->user()->role === 'siswa')
+@else
 <div class="row">
   <div class="col-lg-12">
     <div class="card shadow-sm mb-4">

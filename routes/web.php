@@ -12,13 +12,13 @@ use App\Http\Controllers\SubjectController;
 use Illuminate\Support\Facades\Route;
 
 // Rute Otentikasi
-Route::get('/', [DashboardController::class, 'index']);
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Rute Dashboard Umum (admin & siswa bisa akses)
 Route::middleware(['auth'])->group(function () {
+    Route::get('/', [DashboardController::class, 'index']);
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/student-profile', [ProfileController::class, 'index'])->name('student-profile');
     Route::get('/student-profile/edit', [ProfileController::class, 'edit'])->name('student-profile.edit');
@@ -38,7 +38,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/rekap-ranking', [ScoreController::class, 'rekap'])->name('scores.rekap');
 });
 
-// Rute Siswa (jika perlu nanti)
+// Rute Siswa
 
 Route::middleware(['auth', 'role:siswa'])->group(function () {
     Route::get('/nilai', [ScoreController::class, 'studentIndex'])->name('student-scores');
