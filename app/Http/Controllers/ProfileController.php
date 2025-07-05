@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\StudentParent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -89,5 +90,21 @@ class ProfileController extends Controller
         $student->parent->fill($request->all())->save();
 
         return back()->with('success', 'Data orang tua berhasil diperbarui.');
+    }
+
+    public function updatePhoto(Request $request)
+    {
+        $request->validate([
+            'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+        $user = Auth::user();
+        if ($user->photo && Storage::disk('public')->exists($user->photo)) {
+            Storage::disk('public')->delete($user->photo);
+        }
+        $path = $request->file('photo')->store('photos', 'public');
+        $user->photo = $path;
+        $user->save();
+
+        return back()->with('success', 'Foto profil berhasil diperbarui.');
     }
 }

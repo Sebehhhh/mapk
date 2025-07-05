@@ -1,15 +1,19 @@
 @extends('layouts.app')
 @section('title', 'Profil Siswa')
 @section('content')
+
+<script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
 <div class="row">
   <div class="col-lg-4">
     <div class="card text-center">
       <div class="card-body">
-        <img src="{{ asset('assets/images/profile/user-1.jpg') }}" class="rounded-circle mb-3" width="120" height="120"
-          alt="Foto Profil">
+        <img src="{{ $student->user->photo ? asset('storage/'.$student->user->photo) : asset('assets/images/profile/user-1.jpg') }}"
+          class="rounded-circle mb-3" width="120" height="120" alt="Foto Profil" id="profilePhotoPreview">
         <h5>{{ $student->user->name }}</h5>
         <p class="text-muted">{{ $student->nisn }}</p>
-
+        <button class="btn btn-outline-secondary btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#modalEditPhoto">
+          <span class="iconify" data-icon="mdi:camera" data-width="18"></span> Ganti Foto
+        </button>
       </div>
     </div>
   </div>
@@ -263,4 +267,42 @@
     </form>
   </div>
 </div>
+
+<div class="modal fade" id="modalEditPhoto" tabindex="-1">
+  <div class="modal-dialog">
+    <form class="modal-content" method="POST" action="{{ route('student-profile.update-photo') }}" enctype="multipart/form-data">
+      @csrf @method('PUT')
+      <div class="modal-header">
+        <h5 class="modal-title">Ganti Foto Profil</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="photoPreviewModal"
+          src="{{ $student->user->photo ? asset('storage/'.$student->user->photo) : asset('assets/images/profile/user-1.jpg') }}"
+          class="rounded-circle mb-3" width="100" height="100" style="object-fit:cover;" alt="Preview Foto">
+        <div class="mb-3">
+          <input type="file" name="photo" accept="image/*" class="form-control" onchange="previewProfilePhoto(event)" required>
+          <small class="text-muted d-block mt-1">Format: JPG, PNG, Maks 2 MB.</small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button class="btn btn-primary" type="submit">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function previewProfilePhoto(event) {
+    const input = event.target;
+    const reader = new FileReader();
+    reader.onload = function(){
+      document.getElementById('photoPreviewModal').src = reader.result;
+    };
+    if(input.files && input.files[0]) {
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+</script>
 @endsection

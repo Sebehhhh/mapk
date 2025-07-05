@@ -2,6 +2,7 @@
 @section('title', 'Manajemen Siswa')
 @section('content')
 
+<script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
 <!-- Row -->
 <div class="row">
   <div class="col-lg-12">
@@ -21,7 +22,36 @@
           </ul>
         </div>
         @endif
-
+        <!-- Filter & Search -->
+        <form method="GET" class="row align-items-end g-2 mt-4 mb-2">
+          <div class="col-md-3">
+            <label class="form-label">Kelas</label>
+            <select name="class" class="form-select">
+              <option value="">Semua Kelas</option>
+              <option value="X" {{ request('class')=='X' ? 'selected' : '' }}>X</option>
+              <option value="XI" {{ request('class')=='XI' ? 'selected' : '' }}>XI</option>
+              <option value="XII" {{ request('class')=='XII' ? 'selected' : '' }}>XII</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Jenis Kelamin</label>
+            <select name="gender" class="form-select">
+              <option value="">Semua Gender</option>
+              <option value="L" {{ request('gender')=='L' ? 'selected' : '' }}>Laki-laki</option>
+              <option value="P" {{ request('gender')=='P' ? 'selected' : '' }}>Perempuan</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Cari Nama/NISN</label>
+            <input type="text" name="q" class="form-control" value="{{ request('q') }}"
+              placeholder="Cari nama atau NISN">
+          </div>
+          <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-success mt-2 mt-md-0">
+              <span class="iconify" data-icon="mdi:magnify" data-width="20"></span> Filter
+            </button>
+          </div>
+        </form>
         <div class="table-responsive mt-4">
           <table class="table table-bordered">
             <thead>

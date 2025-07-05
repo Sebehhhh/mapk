@@ -1,8 +1,11 @@
 <aside class="left-sidebar">
   <div>
-    <!-- Logo diganti teks -->
-    <div class="sidebar-title fw-bold fs-5 py-3 px-2 text-center" style="color:#184ebd;letter-spacing:0.5px;">
-      Akademik MAPK NU Haruyan
+    <!-- Logo -->
+    <div class="sidebar-title py-3 px-2" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; margin: 10px;">
+      <div class="d-flex align-items-center justify-content-start">
+        <img src="{{ asset('assets/images/logos/logo.jpeg') }}" alt="Logo MAPK NU Haruyan" class="img-fluid me-2" style="max-height: 60px;">
+        <h4 class="hide-menu mb-0" style="font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 1.25rem; color: white; letter-spacing: 0.5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">MAPK NU Haruyan</h4>
+      </div>
     </div>
     <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
       <ul id="sidebarnav">

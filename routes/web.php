@@ -25,6 +25,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/student-profile/update-student', [ProfileController::class, 'updateStudent'])->name('student-profile.update-student');
     Route::put('/student-profile/update-parent', [ProfileController::class, 'updateParent'])->name('student-profile.update-parent');
     Route::put('/student-profile/update-user', [ProfileController::class, 'updateUser'])->name('student-profile.update-user');
+    Route::put('/student-profile/update-photo', [ProfileController::class, 'updatePhoto'])->name('student-profile.update-photo');
     Route::resource('exam-cards', ExamCardController::class);
 });
 

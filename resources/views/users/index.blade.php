@@ -8,14 +8,29 @@
       <div class="card-body">
         <div class="d-md-flex align-items-center justify-content-between">
           <h4 class="card-title">Manajemen User</h4>
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">Tambah User</button>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">
+            <span class="iconify" data-icon="mdi:plus-circle" data-width="22"></span> Tambah User
+          </button>
         </div>
 
+        @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <ul class="mb-0">
+            @foreach($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+          </ul>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        @endif
+
+
         <div class="table-responsive mt-4">
-          <table class="table table-bordered">
+          <table class="table table-bordered align-middle">
             <thead>
               <tr>
                 <th>No</th>
+                <th>Foto</th>
                 <th>Nama</th>
                 <th>Email</th>
                 <th>Role</th>
@@ -25,14 +40,31 @@
             <tbody>
               @foreach($users as $user)
               <tr>
-                <td>{{ $loop->iteration }}</td>
+                <td>{{ $loop->iteration + ($users->firstItem() - 1) }}</td>
+                <td class="text-center">
+                  @if($user->photo)
+                  <img src="{{ asset('storage/'.$user->photo) }}" alt="Foto" class="rounded-circle" width="48"
+                    height="48" style="object-fit:cover;">
+                  @else
+                  <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&size=48"
+                    class="rounded-circle" width="48" height="48" alt="Default">
+                  @endif
+                </td>
                 <td>{{ $user->name }}</td>
                 <td>{{ $user->email }}</td>
-                <td>{{ $user->role }}</td>
+                <td>
+                  <span class="badge bg-{{ $user->role === 'admin' ? 'primary' : 'success' }}">
+                    {{ ucfirst($user->role) }}
+                  </span>
+                </td>
                 <td>
                   <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
-                    data-bs-target="#editUserModal{{ $user->id }}">Edit</button>
-                  <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ $user->id }})">Hapus</button>
+                    data-bs-target="#editUserModal{{ $user->id }}">
+                    <span class="iconify" data-icon="mdi:pencil" data-width="18"></span> Edit
+                  </button>
+                  <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ $user->id }})">
+                    <span class="iconify" data-icon="mdi:delete" data-width="18"></span> Hapus
+                  </button>
                 </td>
               </tr>
               @endforeach
@@ -45,11 +77,12 @@
   </div>
 </div>
 
+<!-- Modal Edit User -->
 @foreach($users as $user)
-<!-- Modal Edit -->
 <div class="modal fade" id="editUserModal{{ $user->id }}" tabindex="-1">
   <div class="modal-dialog modal-lg">
-    <form class="modal-content" method="POST" action="{{ route('users.update', $user->id) }}">
+    <form class="modal-content" method="POST" action="{{ route('users.update', $user->id) }}"
+      enctype="multipart/form-data">
       @csrf
       @method('PUT')
       <div class="modal-header">
@@ -57,6 +90,20 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
+        <div class="mb-3 text-center">
+          @if($user->photo)
+          <img src="{{ asset('storage/'.$user->photo) }}" alt="Foto" class="rounded-circle mb-2" width="72" height="72"
+            style="object-fit:cover;">
+          @else
+          <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&size=72" class="rounded-circle mb-2"
+            width="72" height="72" alt="Default">
+          @endif
+        </div>
+        <div class="mb-3">
+          <label>Foto (Opsional, untuk ganti foto)</label>
+          <input type="file" name="photo" accept="image/*" class="form-control">
+          <small class="text-muted">Biarkan kosong jika tidak ingin mengubah foto.</small>
+        </div>
         <div class="mb-3">
           <label>Nama</label>
           <input type="text" name="name" class="form-control" value="{{ $user->name }}" required>
@@ -65,7 +112,6 @@
           <label>Email</label>
           <input type="email" name="email" class="form-control" value="{{ $user->email }}" required>
         </div>
-
         <div class="mb-3">
           <label>Role</label>
           <select name="role" class="form-control" required>
@@ -89,16 +135,24 @@
 </div>
 @endforeach
 
-<!-- Modal Tambah -->
+<!-- Modal Tambah User -->
 <div class="modal fade" id="createUserModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
-    <form class="modal-content" method="POST" action="{{ route('users.store') }}">
+    <form class="modal-content" method="POST" action="{{ route('users.store') }}" enctype="multipart/form-data">
       @csrf
       <div class="modal-header">
         <h5 class="modal-title">Tambah User</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
+        <div class="mb-3 text-center">
+          <img src="https://ui-avatars.com/api/?name=User+Baru&size=72" class="rounded-circle mb-2" width="72"
+            height="72" alt="Preview" id="addPhotoPreview">
+        </div>
+        <div class="mb-3">
+          <label>Foto (Opsional)</label>
+          <input type="file" name="photo" accept="image/*" class="form-control" onchange="previewAddPhoto(event)">
+        </div>
         <div class="mb-3">
           <label>Nama</label>
           <input type="text" name="name" class="form-control" required>
@@ -131,6 +185,8 @@
 
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Iconify -->
+<script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
 <script>
   function confirmDelete(userId) {
     Swal.fire({
@@ -150,6 +206,18 @@
         form.submit();
       }
     });
+  }
+
+  // Preview foto saat tambah user
+  function previewAddPhoto(event) {
+    const input = event.target;
+    const reader = new FileReader();
+    reader.onload = function(){
+      document.getElementById('addPhotoPreview').src = reader.result;
+    };
+    if(input.files && input.files[0]) {
+      reader.readAsDataURL(input.files[0]);
+    }
   }
 </script>
 @endsection
