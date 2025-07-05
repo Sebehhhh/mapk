@@ -28,6 +28,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/student-profile/update-user', [ProfileController::class, 'updateUser'])->name('student-profile.update-user');
     Route::put('/student-profile/update-photo', [ProfileController::class, 'updatePhoto'])->name('student-profile.update-photo');
     Route::resource('exam-cards', ExamCardController::class);
+    
 });
 
 // Rute Admin Only
@@ -47,4 +48,5 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 Route::middleware(['auth', 'role:siswa'])->group(function () {
     Route::get('/nilai', [ScoreController::class, 'studentIndex'])->name('student-scores');
     Route::get('/subject', [StudentSubjectController::class, 'subject'])->name('subjects.subject');
+    
 });

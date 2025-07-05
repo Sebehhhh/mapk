@@ -76,4 +76,6 @@ class ExamCardController extends Controller
 
         return redirect()->route('exam-cards.index')->with('success', 'Kartu ujian berhasil dihapus.');
     }
+
+    
 }
