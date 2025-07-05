@@ -59,6 +59,13 @@
             </li>
           </ul>
         </li>
+        <!-- Pengumuman -->
+        <li class="sidebar-item">
+          <a class="sidebar-link" href="{{ route('pengumuman.index') }}">
+            <span class="iconify" data-icon="mdi:microphone" data-width="20"></span>
+            <span class="hide-menu">Pengumuman</span>
+          </a>
+        </li>
         @endif
         
         @if(auth()->user()->role === 'siswa')

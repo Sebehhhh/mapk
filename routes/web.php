@@ -3,6 +3,8 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExamCardController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ScoreController;
 use App\Http\Controllers\StudentController;
@@ -16,10 +18,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/', [HomeController::class, 'index']);
 
 // Rute Dashboard Umum (admin & siswa bisa akses)
 Route::middleware(['auth'])->group(function () {
-    Route::get('/', [DashboardController::class, 'index']);
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/student-profile', [ProfileController::class, 'index'])->name('student-profile');
     Route::get('/student-profile/edit', [ProfileController::class, 'edit'])->name('student-profile.edit');
@@ -28,6 +30,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/student-profile/update-user', [ProfileController::class, 'updateUser'])->name('student-profile.update-user');
     Route::put('/student-profile/update-photo', [ProfileController::class, 'updatePhoto'])->name('student-profile.update-photo');
     Route::resource('exam-cards', ExamCardController::class);
+    Route::resource('pengumuman', PengumumanController::class);
     
 });
 
