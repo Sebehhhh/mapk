@@ -182,7 +182,7 @@
     </div>
 </section>
 
-<section class="section" id="contact">
+<section class="section" id="tentang">
     <div class="container">
         <div class="text-center mb-5">
             <h2>Kontak Sekolah</h2>
