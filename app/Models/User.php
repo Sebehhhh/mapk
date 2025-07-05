@@ -60,4 +60,12 @@ class User extends Authenticatable
     {
         return $this->role === 'siswa';
     }
+
+    public function subjects()
+{
+    return $this->belongsToMany(Subject::class, 'subject_user')
+        ->using(\App\Models\SubjectUser::class) // <- pakai pivot model custom
+        ->withPivot(['year'])
+        ->withTimestamps();
+}
 }

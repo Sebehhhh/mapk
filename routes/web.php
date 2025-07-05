@@ -8,6 +8,7 @@ use App\Http\Controllers\ScoreController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StudentParentController;
+use App\Http\Controllers\StudentSubjectController;
 use App\Http\Controllers\SubjectController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +37,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('student-parents', StudentParentController::class);
     Route::resource('subjects', SubjectController::class);
     Route::resource('scores', ScoreController::class);
+    Route::post('scores/store-multi', [ScoreController::class, 'storeMulti'])->name('scores.store-multi');
+    Route::resource('subject-users', StudentSubjectController::class);
     Route::get('/rekap-ranking', [ScoreController::class, 'rekap'])->name('scores.rekap');
 });
 
@@ -43,4 +46,5 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 Route::middleware(['auth', 'role:siswa'])->group(function () {
     Route::get('/nilai', [ScoreController::class, 'studentIndex'])->name('student-scores');
+    Route::get('/subject', [StudentSubjectController::class, 'subject'])->name('subjects.subject');
 });

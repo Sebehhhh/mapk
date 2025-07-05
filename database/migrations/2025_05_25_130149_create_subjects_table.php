@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('subjects', function (Blueprint $table) {
+        Schema::create('subject_user', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // nama mapel
-            $table->enum('semester', ['ganjil', 'genap']);
-            $table->string('class_level'); // contoh: X, XI, XII
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('subject_id')->constrained()->onDelete('cascade');
+            $table->year('year'); // Tahun ajaran
             $table->timestamps();
+
+            $table->unique(['user_id', 'subject_id', 'year'], 'subject_user_unique');
         });
     }
 

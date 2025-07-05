@@ -19,4 +19,12 @@ class Subject extends Model
     {
         return $this->hasMany(Score::class);
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'subject_user')
+            ->using(\App\Models\SubjectUser::class)
+            ->withPivot(['year'])
+            ->withTimestamps();
+    }
 }
