@@ -5,13 +5,11 @@
   .sidebar-item.active>.sidebar-link,
   .sidebar-link:focus {
     background-color: #27ae60 !important;
-    /* Hijau segar */
     color: #fff !important;
     border-radius: 6px;
     transition: background 0.15s;
   }
 
-  /* Optional: Icon warna putih saat aktif/hover */
   .sidebar-link:hover i,
   .sidebar-link.active i,
   .sidebar-link:focus i {
@@ -29,7 +27,8 @@
           style="max-height: 60px;">
         <h4 class="hide-menu mb-0"
           style="font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 1.25rem; color: white; letter-spacing: 0.5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
-          MAPK NU Haruyan</h4>
+          MAPK NU Haruyan
+        </h4>
       </div>
     </div>
     <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
@@ -46,7 +45,7 @@
         </li>
 
         @if(auth()->user()->role === 'admin')
-        <!-- Kategori Master Data -->
+        <!-- Master Data -->
         <li class="nav-small-cap mt-2"><span class="hide-menu">Master Data</span></li>
         <li class="sidebar-item">
           <a class="sidebar-link has-arrow" href="#">
@@ -64,34 +63,38 @@
           </ul>
         </li>
 
-        <!-- Kategori Hero -->
+        <!-- Homepage (semua menu frontend digabung di sini) -->
         <li class="nav-small-cap mt-2"><span class="hide-menu">Homepage</span></li>
         <li class="sidebar-item">
-          <a class="sidebar-link" href="{{ route('heroes.index') }}">
-            <i class="ti ti-star"></i>
-            <span class="hide-menu">Hero</span>
+          <a class="sidebar-link has-arrow" href="#">
+            <i class="ti ti-home"></i>
+            <span class="hide-menu">Home</span>
           </a>
+          <ul class="collapse first-level">
+            <li>
+              <a class="sidebar-link" href="{{ route('heroes.index') }}">
+                <i class="ti ti-star"></i> Hero Section
+              </a>
+            </li>
+            <li>
+              <a class="sidebar-link" href="{{ route('pengumuman.index') }}">
+                <i class="ti ti-megaphone"></i> Pengumuman
+              </a>
+            </li>
+            <li>
+              <a class="sidebar-link" href="{{ route('abouts.index') }}">
+                <i class="ti ti-info-circle"></i> Tentang Sekolah
+              </a>
+            </li>
+            <li>
+              <a class="sidebar-link" href="{{ route('extracurriculars.index') }}">
+                <i class="ti ti-medal"></i> Ekstrakurikuler
+              </a>
+            </li>
+          </ul>
         </li>
 
-        <!-- Kategori Ekstrakurikuler -->
-        <li class="nav-small-cap mt-2"><span class="hide-menu">Ekstrakurikuler</span></li>
-        <li class="sidebar-item">
-          <a class="sidebar-link" href="{{ route('extracurriculars.index') }}">
-            <i class="ti ti-medal"></i>
-            <span class="hide-menu">Ekstrakurikuler</span>
-          </a>
-        </li>
-
-        <!-- Kategori Tentang -->
-        <li class="nav-small-cap mt-2"><span class="hide-menu">Profil Sekolah</span></li>
-        <li class="sidebar-item">
-          <a class="sidebar-link" href="{{ route('abouts.index') }}">
-            <i class="ti ti-info-circle"></i>
-            <span class="hide-menu">Tentang</span>
-          </a>
-        </li>
-
-        <!-- Kategori Akademik -->
+        <!-- Akademik -->
         <li class="sidebar-item">
           <a class="sidebar-link has-arrow" href="#">
             <i class="ti ti-school"></i>
@@ -107,14 +110,6 @@
             <li><a class="sidebar-link" href="{{ route('scores.rekap') }}"><i class="ti ti-award"></i> Rekap Ranking</a>
             </li>
           </ul>
-        </li>
-
-        <!-- Pengumuman -->
-        <li class="sidebar-item">
-          <a class="sidebar-link" href="{{ route('pengumuman.index') }}">
-            <span class="iconify" data-icon="mdi:microphone" data-width="20"></span>
-            <span class="hide-menu">Pengumuman</span>
-          </a>
         </li>
         @endif
 
@@ -137,8 +132,7 @@
             <li><a class="sidebar-link" href="{{ route('student-scores') }}"><i class="ti ti-chart-bar"></i> Nilai</a>
             </li>
             <li><a class="sidebar-link" href="{{ route('subjects.subject') }}"><i class="ti ti-book"></i> Mata
-                Pelajaran</a>
-            </li>
+                Pelajaran</a></li>
           </ul>
         </li>
         @endif
