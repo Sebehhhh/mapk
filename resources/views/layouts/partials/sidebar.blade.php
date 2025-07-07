@@ -42,6 +42,34 @@
                 Pelajaran</a></li>
           </ul>
         </li>
+
+        <!-- Kategori Hero -->
+        <li class="nav-small-cap mt-2"><span class="hide-menu">Homepage</span></li>
+        <li class="sidebar-item">
+          <a class="sidebar-link" href="{{ route('heroes.index') }}">
+            <i class="ti ti-star"></i>
+            <span class="hide-menu">Hero</span>
+          </a>
+        </li>
+
+        <!-- Kategori Ekstrakurikuler -->
+        <li class="nav-small-cap mt-2"><span class="hide-menu">Ekstrakurikuler</span></li>
+        <li class="sidebar-item">
+          <a class="sidebar-link" href="{{ route('extracurriculars.index') }}">
+            <i class="ti ti-medal"></i>
+            <span class="hide-menu">Ekstrakurikuler</span>
+          </a>
+        </li>
+
+        <!-- Kategori Tentang -->
+        <li class="nav-small-cap mt-2"><span class="hide-menu">Profil Sekolah</span></li>
+        <li class="sidebar-item">
+          <a class="sidebar-link" href="{{ route('abouts.index') }}">
+            <i class="ti ti-info-circle"></i>
+            <span class="hide-menu">Tentang</span>
+          </a>
+        </li>
+
         <!-- Kategori Akademik -->
         <li class="sidebar-item">
           <a class="sidebar-link has-arrow" href="#">
@@ -59,6 +87,7 @@
             </li>
           </ul>
         </li>
+
         <!-- Pengumuman -->
         <li class="sidebar-item">
           <a class="sidebar-link" href="{{ route('pengumuman.index') }}">
@@ -67,7 +96,7 @@
           </a>
         </li>
         @endif
-        
+
         @if(auth()->user()->role === 'siswa')
         <li class="nav-small-cap mt-2"><span class="hide-menu">Profil & Akademik</span></li>
         <li class="sidebar-item">

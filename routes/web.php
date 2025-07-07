@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExamCardController;
+use App\Http\Controllers\ExtracurricularController;
+use App\Http\Controllers\HeroController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\ProfileController;
@@ -31,7 +34,6 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/student-profile/update-photo', [ProfileController::class, 'updatePhoto'])->name('student-profile.update-photo');
     Route::resource('exam-cards', ExamCardController::class);
     Route::resource('pengumuman', PengumumanController::class);
-    
 });
 
 // Rute Admin Only
@@ -44,6 +46,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('scores/store-multi', [ScoreController::class, 'storeMulti'])->name('scores.store-multi');
     Route::resource('subject-users', StudentSubjectController::class);
     Route::get('/rekap-ranking', [ScoreController::class, 'rekap'])->name('scores.rekap');
+
+    // Manajemen Homepage
+    Route::resource('heroes', HeroController::class);
+    Route::resource('extracurriculars', ExtracurricularController::class);
+    Route::resource('abouts', AboutController::class);
+    
 });
 
 // Rute Siswa
@@ -51,5 +59,4 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 Route::middleware(['auth', 'role:siswa'])->group(function () {
     Route::get('/nilai', [ScoreController::class, 'studentIndex'])->name('student-scores');
     Route::get('/subject', [StudentSubjectController::class, 'subject'])->name('subjects.subject');
-    
 });
