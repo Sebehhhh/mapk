@@ -4,9 +4,9 @@
 
 <div class="card shadow mb-4">
     <div class="card-header bg-light d-flex align-items-center justify-content-between">
-        <h4 class="fw-bold mb-0"><span class="me-2"
+        {{-- <h4 class="fw-bold mb-0"><span class="me-2"
                 style="background:#ccc;display:inline-block;width:28px;height:28px;border-radius:6px;vertical-align:middle;"></span>Nilai
-        </h4>
+        </h4> --}}
         <form method="get" class="mb-3 d-flex gap-2">
             <select class="form-select" name="kelas" style="width:auto;" onchange="this.form.submit()">
                 @foreach($availableClasses as $cls)

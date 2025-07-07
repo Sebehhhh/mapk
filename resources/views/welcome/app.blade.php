@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title> Nova Free Bootstrap Template for Agency &mdash; by FreeBootstrap.net </title>
+    <title>@yield('title', 'MAPK NU Haruyan - Madrasah Aliyah Pertasi Kencana')</title>
 
     <!-- ======= Google Font =======-->
     <link rel="preconnect" href="https://fonts.googleapis.com">

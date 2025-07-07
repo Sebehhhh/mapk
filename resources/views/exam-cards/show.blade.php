@@ -1,63 +1,104 @@
 @extends('layouts.app')
 @section('title', 'Kartu Ujian')
 @section('content')
-
 <style>
   @media print {
-    body, html {
+
+    body,
+    html {
       background: #fff !important;
     }
-    .no-print, header, nav, aside, footer, .app-header, .app-sidebar, .sidebar, .main-footer, .navbar, .breadcrumb,
-    .copyright, .pagination, .btn, .alert, .d-flex.justify-content-end, .card-title, .bi-printer {
+
+    .no-print,
+    header,
+    nav,
+    aside,
+    footer,
+    .app-header,
+    .app-sidebar,
+    .sidebar,
+    .main-footer,
+    .navbar,
+    .breadcrumb,
+    .copyright,
+    .pagination,
+    .btn,
+    .alert,
+    .d-flex.justify-content-end,
+    .card-title,
+    .bi-printer {
       display: none !important;
     }
-    .container, .row, .col-lg-8, .card, .card-body, .mb-5, .px-2, .py-4 {
-      background: #fff !important;
+
+    .kartu-ujian {
       box-shadow: none !important;
-      border: none !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      width: 100% !important;
-      max-width: 100% !important;
+      border: 1px solid #aaa !important;
+      margin: 0 auto 20px auto !important;
+      page-break-after: always;
+      max-width: 420px !important;
     }
-    /* Hilangkan print footer/page number yang muncul di browser */
-    @page { margin: 0.5in 0.5in 0.3in 0.5in !important; }
+
+    @page {
+      margin: 0.3in 0.3in 0.3in 0.3in !important;
+    }
   }
-  </style>
 
-<div class="container py-4" style="background: #fff;">
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
+  .kartu-ujian {
+    border: 1px solid #ddd;
+    max-width: 420px;
+    margin: 24px auto 0 auto;
+    padding: 16px 20px 16px 22px;
+    background: #fff;
+    font-size: 1rem;
+  }
 
-      @forelse ($examCards as $card)
-      <div class="mb-5 px-2 py-4" style="border: 1px solid #fff;">
-        {{-- HEADER: Logo + Judul + Garis --}}
-        <div class="d-flex align-items-start justify-content-between">
-          <div style="min-width:80;max-width:80;">
-            <img src="{{ asset('assets/images/logos/logo.png') }}" alt="Logo" style="width:100px;height:100px;">
-          </div>
-          <div class="flex-grow-1 text-center ps-3" style="padding-top:12px">
-            <div style="font-size: 1.4rem;font-weight: 500;">madrasah Aliyah Pertasi Kencana</div>
-            <div style="font-size: 1.2rem;margin-top:2px;">Nu haruyan</div>
-          </div>
-          <div style="min-width:80;max-width:80;"></div> {{-- Empty for balancing --}}
-        </div>
-        <hr style="border-top: 3px solid #111; margin-top:16px; margin-bottom:32px;">
+  .kartu-ujian .judul {
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+  }
 
-        {{-- Data Peserta, rata kiri, font besar, space tebal --}}
-        <div style="font-size:1.35rem;line-height:2.4;">
-          <div>Nomor Peserta : <span style="font-weight:400;">{{ $card->student->id }}</span></div>
-          <div>Nama&nbsp;: <span style="font-weight:400;">{{ $card->student->user->name }}</span></div>
-          <div>Kelas&nbsp;: <span style="font-weight:400;">{{ $card->student->class }}</span></div>
-          <div>Jenis Ujian&nbsp;: <span style="font-weight:400;">{{ $card->exam_type }}</span></div>
-          <div>Tahun Ajaran&nbsp;: <span style="font-weight:400;">{{ $card->year }}</span></div>
-        </div>
-      </div>
-      @empty
-      <p class="text-center text-muted py-5">Belum ada kartu ujian yang tersedia.</p>
-      @endforelse
-     
+  .kartu-ujian .subjudul {
+    font-size: 0.99rem;
+    margin-bottom: 2px;
+    text-align: center;
+  }
+
+  .kartu-ujian .data-siswa {
+    margin-top: 15px;
+    font-size: 1rem;
+    line-height: 2;
+    font-weight: 500;
+    text-align: left;
+  }
+
+  @media (max-width: 600px) {
+    .kartu-ujian {
+      max-width: 99vw;
+      padding: 8px;
+    }
+  }
+</style>
+
+@forelse ($examCards as $card)
+<div class="kartu-ujian">
+  <div class="d-flex align-items-center justify-content-center" style="gap:14px;">
+    <img src="{{ asset('assets/images/logos/logo.png') }}" alt="Logo" style="width:62px; height:62px;">
+    <div>
+      <div class="judul">madrasah Aliyah Pertasi Kencana</div>
+      <div class="subjudul">Nu haruyan</div>
     </div>
   </div>
+  <hr style="border-top: 2.5px solid #111; margin:12px 0 15px 0;">
+  <div class="data-siswa">
+    Nomor Peserta : <span style="font-weight:400;">{{ $card->student->id }}</span><br>
+    Nama : <span style="font-weight:400;">{{ $card->student->user->name }}</span><br>
+    Kelas : <span style="font-weight:400;">{{ $card->student->class }}</span><br>
+    Jenis Ujian : <span style="font-weight:400;">{{ $card->exam_type }}</span><br>
+    Tahun Ajaran : <span style="font-weight:400;">{{ $card->year }}</span>
+  </div>
 </div>
+@empty
+<p class="text-center text-muted py-5">Belum ada kartu ujian yang tersedia.</p>
+@endforelse
 @endsection

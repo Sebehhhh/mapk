@@ -112,7 +112,7 @@
           </a>
           <ul class="collapse first-level">
             <li><a class="sidebar-link" href="{{ route('exam-cards.show', auth()->user()->student->id) }}"><i
-                  class="ti ti-id-badge"></i> Kartu Ujian</a></li>
+                  class="ti ti-id-badge"></i> Kartu Ulangan</a></li>
             <li><a class="sidebar-link" href="{{ route('student-scores') }}"><i class="ti ti-chart-bar"></i> Nilai</a>
             </li>
             <li><a class="sidebar-link" href="{{ route('subjects.subject') }}"><i class="ti ti-book"></i> Mata
