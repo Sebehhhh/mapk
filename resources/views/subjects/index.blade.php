@@ -7,7 +7,8 @@
       <div class="card-body">
         <div class="d-md-flex align-items-center justify-content-between">
           <h4 class="card-title">Manajemen Mata Pelajaran</h4>
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createSubjectModal">Tambah Mata Pelajaran</button>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createSubjectModal">Tambah Mata
+            Pelajaran</button>
         </div>
 
         {{-- Pesan Sukses/Error --}}
@@ -24,6 +25,40 @@
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         @endif
+
+        <!-- FILTER Mata Pelajaran -->
+        <form method="GET" class="row align-items-end g-2 mt-4 mb-2">
+          <div class="col-md-3">
+            <label class="form-label">Semester</label>
+            <select name="semester" class="form-select">
+              <option value="">Semua Semester</option>
+              <option value="Ganjil" {{ request('semester')=='Ganjil' ? 'selected' : '' }}>Ganjil</option>
+              <option value="Genap" {{ request('semester')=='Genap' ? 'selected' : '' }}>Genap</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Level Kelas</label>
+            <select name="class_level" class="form-select">
+              <option value="">Semua Level</option>
+              <option value="X" {{ request('class_level')=='X' ? 'selected' : '' }}>X</option>
+              <option value="XI" {{ request('class_level')=='XI' ? 'selected' : '' }}>XI</option>
+              <option value="XII" {{ request('class_level')=='XII' ? 'selected' : '' }}>XII</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Cari Nama Mapel</label>
+            <input type="text" name="q" class="form-control" value="{{ request('q') }}"
+              placeholder="Cari nama mapel...">
+          </div>
+          <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-success mt-2 mt-md-0">
+              <span class="iconify" data-icon="mdi:magnify" data-width="20"></span> Filter
+            </button>
+            @if(request('semester') || request('class_level') || request('q'))
+            <a href="{{ route('subjects.index') }}" class="btn btn-outline-secondary mt-2">Reset</a>
+            @endif
+          </div>
+        </form>
 
         <div class="table-responsive mt-4">
           <table class="table table-bordered">
@@ -51,7 +86,7 @@
               </tr>
               @empty
               <tr>
-                  <td colspan="5" class="text-center">Tidak ada data mata pelajaran.</td>
+                <td colspan="5" class="text-center">Tidak ada data mata pelajaran.</td>
               </tr>
               @endforelse
             </tbody>
@@ -65,7 +100,8 @@
 
 {{-- Modal Edit --}}
 @foreach($subjects as $subject)
-<div class="modal fade" id="editSubjectModal{{ $subject->id }}" tabindex="-1" aria-labelledby="editSubjectModalLabel{{ $subject->id }}" aria-hidden="true">
+<div class="modal fade" id="editSubjectModal{{ $subject->id }}" tabindex="-1"
+  aria-labelledby="editSubjectModalLabel{{ $subject->id }}" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <form class="modal-content" method="POST" action="{{ route('subjects.update', $subject->id) }}">
       @csrf
@@ -77,7 +113,8 @@
       <div class="modal-body">
         <div class="mb-3">
           <label for="name{{ $subject->id }}" class="form-label">Nama Mata Pelajaran</label>
-          <input type="text" name="name" class="form-control" id="name{{ $subject->id }}" value="{{ $subject->name }}" required>
+          <input type="text" name="name" class="form-control" id="name{{ $subject->id }}" value="{{ $subject->name }}"
+            required>
         </div>
         <div class="mb-3">
           <label for="semester{{ $subject->id }}" class="form-label">Semester</label>
@@ -107,7 +144,8 @@
 @endforeach
 
 {{-- Modal Tambah --}}
-<div class="modal fade" id="createSubjectModal" tabindex="-1" aria-labelledby="createSubjectModalLabel" aria-hidden="true">
+<div class="modal fade" id="createSubjectModal" tabindex="-1" aria-labelledby="createSubjectModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <form class="modal-content" method="POST" action="{{ route('subjects.store') }}">
       @csrf

@@ -7,13 +7,24 @@
   <div class="col-lg-4">
     <div class="card text-center">
       <div class="card-body">
-        <img src="{{ $student->user->photo ? asset('storage/'.$student->user->photo) : asset('assets/images/profile/user-1.jpg') }}"
+        <img
+          src="{{ $student->user->photo ? asset('storage/'.$student->user->photo) : asset('assets/images/profile/user-1.jpg') }}"
           class="rounded-circle mb-3" width="120" height="120" alt="Foto Profil" id="profilePhotoPreview">
         <h5>{{ $student->user->name }}</h5>
         <p class="text-muted">{{ $student->nisn }}</p>
         <button class="btn btn-outline-secondary btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#modalEditPhoto">
           <span class="iconify" data-icon="mdi:camera" data-width="18"></span> Ganti Foto
         </button>
+
+        @if($student->user->photo)
+        <button type="button" class="btn btn-outline-danger btn-sm mt-2" id="btn-hapus-foto">
+          <span class="iconify" data-icon="mdi:trash-can" data-width="18"></span> Hapus Foto
+        </button>
+        <form id="form-hapus-foto" action="{{ route('student-profile.delete-photo') }}" method="POST" class="d-none">
+          @csrf
+          @method('DELETE')
+        </form>
+        @endif
       </div>
     </div>
   </div>
@@ -270,7 +281,8 @@
 
 <div class="modal fade" id="modalEditPhoto" tabindex="-1">
   <div class="modal-dialog">
-    <form class="modal-content" method="POST" action="{{ route('student-profile.update-photo') }}" enctype="multipart/form-data">
+    <form class="modal-content" method="POST" action="{{ route('student-profile.update-photo') }}"
+      enctype="multipart/form-data">
       @csrf @method('PUT')
       <div class="modal-header">
         <h5 class="modal-title">Ganti Foto Profil</h5>
@@ -281,10 +293,13 @@
           src="{{ $student->user->photo ? asset('storage/'.$student->user->photo) : asset('assets/images/profile/user-1.jpg') }}"
           class="rounded-circle mb-3" width="100" height="100" style="object-fit:cover;" alt="Preview Foto">
         <div class="mb-3">
-          <input type="file" name="photo" accept="image/*" class="form-control" onchange="previewProfilePhoto(event)" required>
+          <input type="file" name="photo" accept="image/*" class="form-control" onchange="previewProfilePhoto(event)"
+            required>
           <small class="text-muted d-block mt-1">Format: JPG, PNG, Maks 2 MB.</small>
         </div>
       </div>
+
+
       <div class="modal-footer">
         <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
         <button class="btn btn-primary" type="submit">Simpan</button>
@@ -292,7 +307,7 @@
     </form>
   </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   function previewProfilePhoto(event) {
     const input = event.target;
@@ -304,5 +319,30 @@
       reader.readAsDataURL(input.files[0]);
     }
   }
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      const btnHapus = document.getElementById('btn-hapus-foto');
+      const formHapus = document.getElementById('form-hapus-foto');
+      if (btnHapus) {
+          btnHapus.addEventListener('click', function(e) {
+              e.preventDefault();
+              Swal.fire({
+                  title: 'Yakin hapus foto profil?',
+                  text: "Aksi ini tidak bisa dibatalkan.",
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#d33',
+                  cancelButtonColor: '#3085d6',
+                  confirmButtonText: 'Ya, hapus!',
+                  cancelButtonText: 'Batal'
+              }).then((result) => {
+                  if (result.isConfirmed) {
+                      formHapus.submit();
+                  }
+              });
+          });
+      }
+  });
 </script>
 @endsection

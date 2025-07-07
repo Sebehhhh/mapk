@@ -9,6 +9,19 @@ use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
+
+    public function deletePhoto(Request $request)
+    {
+        $user = Auth::user();
+        if ($user->photo) {
+            // Hapus file fisik (storage public/photos atau folder sesuai path)
+            Storage::delete('public/' . $user->photo);
+            $user->photo = null;
+            $user->save();
+        }
+        return back()->with('success', 'Foto profil berhasil dihapus.');
+    }
+
     public function index()
     {
         $student = Auth::user()->student()->with('user', 'parent')->first();

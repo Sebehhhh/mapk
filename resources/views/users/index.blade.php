@@ -1,7 +1,8 @@
 @extends('layouts.app')
 @section('title', 'Manajemen User')
 @section('content')
-<!-- Row 1 -->
+{{-- <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script> --}}
+<!-- Row -->
 <div class="row">
   <div class="col-lg-12">
     <div class="card w-100">
@@ -14,7 +15,7 @@
         </div>
 
         @if($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
           <ul class="mb-0">
             @foreach($errors->all() as $error)
             <li>{{ $error }}</li>
@@ -24,6 +25,33 @@
         </div>
         @endif
 
+        <!-- FILTER & SEARCH -->
+        <form method="GET" class="row align-items-end g-2 mt-4 mb-2">
+          <div class="col-md-3">
+            <label class="form-label">Role</label>
+            <select name="role" class="form-select">
+              <option value="">Semua Role</option>
+              <option value="admin" {{ request('role')=='admin' ? 'selected' : '' }}>Admin</option>
+              <option value="siswa" {{ request('role')=='siswa' ? 'selected' : '' }}>Siswa</option>
+            </select>
+          </div>
+          <div class="col-md-5">
+            <label class="form-label">Cari Nama/Email</label>
+            <input type="text" name="q" class="form-control" value="{{ request('q') }}"
+              placeholder="Cari nama atau email...">
+          </div>
+          <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-success mt-2 mt-md-0">
+              <span class="iconify" data-icon="mdi:magnify" data-width="20"></span> Filter
+            </button>
+          </div>
+          <div class="col-md-2 d-grid">
+            @if(request('q') || request('role'))
+            <a href="{{ route('users.index') }}" class="btn btn-outline-success mt-2 mt-md-0">Reset</a>
+            @endif
+          </div>
+        </form>
+        <!-- END FILTER -->
 
         <div class="table-responsive mt-4">
           <table class="table table-bordered align-middle">

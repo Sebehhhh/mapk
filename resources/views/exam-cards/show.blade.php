@@ -80,6 +80,13 @@
   }
 </style>
 
+{{-- Tombol Print --}}
+<div class="d-flex justify-content-end mb-3 no-print">
+  <button class="btn btn-success" onclick="window.print()">
+    <i class="bi bi-printer"></i> Cetak Semua
+  </button>
+</div>
+
 @forelse ($examCards as $card)
 <div class="kartu-ujian">
   <div class="d-flex align-items-center justify-content-center" style="gap:14px;">

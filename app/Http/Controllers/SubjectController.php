@@ -11,9 +11,22 @@ class SubjectController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $subjects = Subject::orderBy('name', 'asc')->paginate(10);
+        $query = \App\Models\Subject::query();
+
+        if ($request->filled('semester')) {
+            $query->where('semester', $request->semester);
+        }
+        if ($request->filled('class_level')) {
+            $query->where('class_level', $request->class_level);
+        }
+        if ($request->filled('q')) {
+            $q = $request->q;
+            $query->where('name', 'like', "%{$q}%");
+        }
+
+        $subjects = $query->orderBy('name')->paginate(10)->withQueryString();
         return view('subjects.index', compact('subjects'));
     }
 
@@ -43,7 +56,7 @@ class SubjectController extends Controller
                 // Pastikan kombinasi nama, semester, dan level kelas unik
                 Rule::unique('subjects')->where(function ($query) use ($request) {
                     return $query->where('semester', $request->semester)
-                                 ->where('class_level', $request->class_level);
+                        ->where('class_level', $request->class_level);
                 }),
             ],
             'semester' => 'required|string|max:50',
@@ -102,7 +115,7 @@ class SubjectController extends Controller
                 // Pastikan kombinasi nama, semester, dan level kelas unik, kecuali untuk mata pelajaran ini sendiri
                 Rule::unique('subjects')->ignore($subject->id)->where(function ($query) use ($request) {
                     return $query->where('semester', $request->semester)
-                                 ->where('class_level', $request->class_level);
+                        ->where('class_level', $request->class_level);
                 }),
             ],
             'semester' => 'required|string|max:50',

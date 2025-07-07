@@ -59,4 +59,5 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 Route::middleware(['auth', 'role:siswa'])->group(function () {
     Route::get('/nilai', [ScoreController::class, 'studentIndex'])->name('student-scores');
     Route::get('/subject', [StudentSubjectController::class, 'subject'])->name('subjects.subject');
+    Route::delete('/student-profile/delete-photo', [ProfileController::class, 'deletePhoto'])->name('student-profile.delete-photo');
 });

@@ -1,3 +1,24 @@
+<style>
+  /* Sidebar link: Hover & Aktif (Hijau) */
+  .sidebar-link:hover,
+  .sidebar-link.active,
+  .sidebar-item.active>.sidebar-link,
+  .sidebar-link:focus {
+    background-color: #27ae60 !important;
+    /* Hijau segar */
+    color: #fff !important;
+    border-radius: 6px;
+    transition: background 0.15s;
+  }
+
+  /* Optional: Icon warna putih saat aktif/hover */
+  .sidebar-link:hover i,
+  .sidebar-link.active i,
+  .sidebar-link:focus i {
+    color: #fff !important;
+  }
+</style>
+
 <aside class="left-sidebar">
   <div>
     <!-- Logo -->
@@ -82,7 +103,7 @@
             <li><a class="sidebar-link" href="{{ route('scores.index') }}"><i class="ti ti-chart-bar"></i> Nilai</a>
             </li>
             <li><a class="sidebar-link" href="{{ route('exam-cards.index') }}"><i class="ti ti-id-badge"></i> Kartu
-                Ujian</a></li>
+                Ulangan</a></li>
             <li><a class="sidebar-link" href="{{ route('scores.rekap') }}"><i class="ti ti-award"></i> Rekap Ranking</a>
             </li>
           </ul>

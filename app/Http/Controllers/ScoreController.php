@@ -14,50 +14,73 @@ class ScoreController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-{
-    // Untuk form multi input nilai
-    $students = Student::with('user')->orderBy('nisn', 'asc')->get();
-    $subjects = Subject::orderBy('name', 'asc')->get();
-    $mapels = [];
+    {
+        // --- Ambil filter kelas (class_level) ---
+        $class_level = $request->class_level;
 
-    // Jika request filter siswa & semester (multi input)
-    if ($request->filled('student_id') && $request->filled('semester') && !$request->has('filter_table')) {
-        $student = Student::find($request->student_id);
-        // Ambil mapel dari pivot subject_user (hanya mapel yg diambil siswa di semester itu)
-        if ($student && $student->user) {
-            $mapels = $student->user
-                ->subjects()
-                ->where('subjects.semester', $request->semester)
-                ->orderBy('name', 'asc')
-                ->get();
+        // Siswa diurutkan dan bisa difilter by kelas
+        $students = Student::with('user')
+            ->when($class_level, function ($q) use ($class_level) {
+                $q->where('class', $class_level);
+            })
+            ->orderBy('nisn', 'asc')
+            ->get();
+
+        // Mapel juga bisa difilter by kelas
+        $subjects = Subject::when($class_level, function ($q) use ($class_level) {
+            $q->where('class_level', $class_level);
+        })
+            ->orderBy('name', 'asc')
+            ->get();
+
+        $mapels = [];
+
+        // --- Form multi input nilai (input nilai banyak mapel sekaligus) ---
+        if (
+            $request->filled('student_id')
+            && $request->filled('semester')
+            && !$request->has('filter_table')
+        ) {
+            $student = Student::find($request->student_id);
+
+            if ($student && $student->user) {
+                // Hanya mapel yg diambil siswa di semester itu, dan by kelas
+                $mapels = $student->user
+                    ->subjects()
+                    ->where('subjects.semester', $request->semester)
+                    ->when($class_level, function ($q) use ($class_level) {
+                        $q->where('subjects.class_level', $class_level);
+                    })
+                    ->orderBy('name', 'asc')
+                    ->get();
+            }
         }
+
+        // --- Filtering tabel list nilai ---
+        $query = Score::with(['student.user', 'subject']);
+
+        // Jika filter table aktif (pakai tombol filter)
+        if ($request->has('filter_table')) {
+            if ($request->student_id) {
+                $query->where('student_id', $request->student_id);
+            }
+            if ($request->semester) {
+                $query->where('semester', $request->semester);
+            }
+            if ($class_level) {
+                $query->whereHas('subject', function ($q) use ($class_level) {
+                    $q->where('class_level', $class_level);
+                });
+            }
+            if ($request->subject_id) {
+                $query->where('subject_id', $request->subject_id);
+            }
+        }
+
+        $scores = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
+
+        return view('scores.index', compact('scores', 'students', 'subjects', 'mapels'));
     }
-
-    // --- FILTERING UNTUK TABLE LIST NILAI ---
-    $query = Score::with(['student.user', 'subject']);
-
-    // Cek apakah filter table aktif (pakai tombol submit name/filter_table)
-    if ($request->has('filter_table')) {
-        if ($request->student_id) {
-            $query->where('student_id', $request->student_id);
-        }
-        if ($request->semester) {
-            $query->where('semester', $request->semester);
-        }
-        if ($request->class_level) {
-            $query->whereHas('subject', function ($q) use ($request) {
-                $q->where('class_level', $request->class_level);
-            });
-        }
-        if ($request->subject_id) {
-            $query->where('subject_id', $request->subject_id);
-        }
-    }
-
-    $scores = $query->orderBy('created_at', 'desc')->paginate(10);
-
-    return view('scores.index', compact('scores', 'students', 'subjects', 'mapels'));
-}
 
     /**
      * Store nilai satuan (modal lama, masih dipakai di edit).

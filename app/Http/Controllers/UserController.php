@@ -9,12 +9,29 @@ use Illuminate\Support\Facades\Storage;
 class UserController extends Controller
 {
     // Display a listing of the users.
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::paginate(10);
+        $query = \App\Models\User::query();
+
+        // Filter by Role
+        if ($request->filled('role')) {
+            $query->where('role', $request->role);
+        }
+
+        // Search by Name or Email
+        if ($request->filled('q')) {
+            $q = $request->q;
+            $query->where(function ($sub) use ($q) {
+                $sub->where('name', 'like', "%{$q}%")
+                    ->orWhere('email', 'like', "%{$q}%");
+            });
+        }
+
+        // Pagination, 10 per page, bawa query string biar filter gak hilang di next page
+        $users = $query->orderBy('name')->paginate(10)->withQueryString();
+
         return view('users.index', compact('users'));
     }
-
     // Store a newly created user in storage.
     public function store(Request $request)
     {

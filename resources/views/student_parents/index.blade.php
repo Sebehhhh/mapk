@@ -12,6 +12,25 @@
                         Data</button>
                 </div>
 
+                <!-- Filter Orang Tua -->
+                <form method="GET" class="row align-items-end g-2 mt-4 mb-2">
+                    <div class="col-md-6">
+                        <label class="form-label">Cari Nama Siswa / Ayah / Ibu</label>
+                        <input type="text" name="q" class="form-control"
+                            placeholder="Ketik nama siswa, ayah, atau ibu..." value="{{ request('q') }}">
+                    </div>
+                    <div class="col-md-2 d-grid">
+                        <button type="submit" class="btn btn-success mt-2 mt-md-0">
+                            <span class="iconify" data-icon="mdi:magnify" data-width="20"></span> Filter
+                        </button>
+                    </div>
+                    <div class="col-md-2 d-grid">
+                        @if(request('q'))
+                        <a href="{{ route('student-parents.index') }}" class="btn btn-outline-secondary mt-2">Reset</a>
+                        @endif
+                    </div>
+                </form>
+
                 <div class="table-responsive mt-4">
                     <table class="table table-bordered">
                         <thead>

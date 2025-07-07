@@ -7,9 +7,21 @@ use App\Models\StudentParent;
 
 class StudentParentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $parents = StudentParent::with('student.user')->paginate(10);
+        $query = StudentParent::with('student.user');
+
+        if ($request->filled('q')) {
+            $q = $request->q;
+            $query->whereHas('student.user', function ($user) use ($q) {
+                $user->where('name', 'like', "%$q%");
+            })
+                ->orWhere('father_name', 'like', "%$q%")
+                ->orWhere('mother_name', 'like', "%$q%");
+        }
+
+        $parents = $query->orderByDesc('id')->paginate(10)->withQueryString();
+
         return view('student_parents.index', compact('parents'));
     }
 

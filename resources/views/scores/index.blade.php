@@ -207,23 +207,34 @@
   </div>
 </div>
 
-{{-- Modal Pilih Siswa & Semester --}}
+{{-- Modal Pilih Kelas, Siswa & Semester --}}
 <div class="modal fade" id="pickStudentModal" tabindex="-1" aria-labelledby="pickStudentModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <form class="modal-content" method="GET" action="{{ route('scores.index') }}">
       <div class="modal-header">
-        <h5 class="modal-title" id="pickStudentModalLabel">Pilih Siswa & Semester</h5>
+        <h5 class="modal-title" id="pickStudentModalLabel">Pilih Kelas, Siswa & Semester</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
+        <div class="mb-3">
+          <label for="class_level_pick" class="form-label">Kelas</label>
+          <select name="class_level" class="form-select" id="class_level_pick" required>
+            <option value="">Pilih Kelas</option>
+            @foreach(['X','XI','XII'] as $kelas)
+            <option value="{{ $kelas }}" {{ request('class_level')==$kelas ? 'selected' : '' }}>{{ $kelas }}</option>
+            @endforeach
+          </select>
+        </div>
         <div class="mb-3">
           <label for="student_id_pick" class="form-label">Nama Siswa</label>
           <select name="student_id" class="form-select" id="student_id_pick" required>
             <option value="">Pilih Siswa</option>
             @foreach($students as $student)
+            @if(request('class_level') == '' || $student->class == request('class_level'))
             <option value="{{ $student->id }}" {{ request('student_id')==$student->id ? 'selected' : '' }}>
               {{ $student->user->name ?? 'N/A' }} ({{ $student->nisn }})
             </option>
+            @endif
             @endforeach
           </select>
         </div>
