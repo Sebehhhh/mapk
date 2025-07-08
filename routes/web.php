@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::get('/', [HomeController::class, 'index']);
+Route::get('/', [HomeController::class, 'index'])->name('homepage');
 Route::get('/exam-cards/download-pdf', [ExamCardController::class, 'downloadPdf'])->name('exam-cards.download-pdf');
 // Rute Dashboard Umum (admin & siswa bisa akses)
 Route::middleware(['auth'])->group(function () {
