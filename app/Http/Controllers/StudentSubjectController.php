@@ -7,13 +7,85 @@ use Illuminate\Support\Facades\Auth;
 
 class StudentSubjectController extends Controller
 {
+    public function storeBatch(Request $request)
+    {
+        // Validasi input
+        $validated = $request->validate([
+            'user_id'      => 'required|exists:users,id',
+            'class_level'  => 'required',
+            'semester'     => 'required',
+            'year'         => 'required|digits:4|integer|min:2000|max:' . (date('Y') + 1),
+            'subject_ids'  => 'required|array|min:1',
+            'subject_ids.*' => 'exists:subjects,id',
+        ]);
+
+        $user_id  = $validated['user_id'];
+        $year     = $validated['year'];
+        $subject_ids = $validated['subject_ids'];
+
+        $inserted = 0;
+        $skipped  = 0;
+
+        foreach ($subject_ids as $subject_id) {
+            // Cek apakah sudah ada mapping dengan parameter ini
+            $exists = \App\Models\SubjectUser::where('user_id', $user_id)
+                ->where('subject_id', $subject_id)
+                ->where('year', $year)
+                ->exists();
+            if ($exists) {
+                $skipped++;
+                continue;
+            }
+            \App\Models\SubjectUser::create([
+                'user_id'    => $user_id,
+                'subject_id' => $subject_id,
+                'year'       => $year,
+            ]);
+            $inserted++;
+        }
+
+        if ($inserted > 0) {
+            $msg = "$inserted mapel berhasil di-assign ke siswa.";
+            if ($skipped > 0) $msg .= " ($skipped duplikat di-skip.)";
+            return redirect()->route('subject-users.index')->with('success', $msg);
+        } else {
+            return redirect()->route('subject-users.index')->with('error', 'Tidak ada mapel baru yang di-assign (semua sudah ada).');
+        }
+    }
+
+    public function getMapel(Request $request)
+    {
+        $classLevel = $request->input('class_level');
+        $semester = $request->input('semester');
+
+        // Validasi sederhana (optional, biar anti typo)
+        if (!$classLevel || !$semester) {
+            return response()->json([
+                'status' => false,
+                'message' => 'class_level dan semester harus diisi',
+                'data' => []
+            ], 422);
+        }
+
+        $subjects = \App\Models\Subject::where('class_level', $classLevel)
+            ->where('semester', $semester)
+            ->orderBy('name')
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Daftar mapel ditemukan',
+            'data' => $subjects
+        ]);
+    }
+
     public function subject(Request $request)
     {
         $user = Auth::user();
 
+        // Query utama (filtered)
         $query = $user->subjects()->withPivot('year');
 
-        // Filter
         if ($request->filled('year')) {
             $query->wherePivot('year', $request->year);
         }
@@ -26,11 +98,21 @@ class StudentSubjectController extends Controller
 
         $subjects = $query->paginate(10)->withQueryString();
 
-        // *** Ini penting! ***
-        // Pluck harus spesifik dari tabel 'subjects'
-        $availableYears = $user->subjects()->distinct()->pluck('subject_user.year');
-        $availableSemesters = $user->subjects()->distinct()->pluck('subjects.semester'); // <-- Perbaiki ini!
-        $availableClasses = $user->subjects()->distinct()->pluck('subjects.class_level');
+        // --- Ambil Filter Unik dengan efisien ---
+        $availableYears = $user->subjects()
+            ->select('subject_user.year')
+            ->distinct()
+            ->pluck('subject_user.year');
+
+        $availableSemesters = $user->subjects()
+            ->select('subjects.semester')
+            ->distinct()
+            ->pluck('subjects.semester');
+
+        $availableClasses = $user->subjects()
+            ->select('subjects.class_level')
+            ->distinct()
+            ->pluck('subjects.class_level');
 
         return view('subjects.subject', [
             'subjects' => $subjects,

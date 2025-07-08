@@ -15,6 +15,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\StudentParentController;
 use App\Http\Controllers\StudentSubjectController;
 use App\Http\Controllers\SubjectController;
+use App\Models\Subject;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Rute Otentikasi
@@ -51,7 +53,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('heroes', HeroController::class);
     Route::resource('extracurriculars', ExtracurricularController::class);
     Route::resource('abouts', AboutController::class);
-    
+    Route::post('/subject-users/store-batch', [StudentSubjectController::class, 'storeBatch'])->name('subject-users.store-batch');
+    Route::get('/get-mapel', [StudentSubjectController::class, 'getMapel']);
 });
 
 // Rute Siswa

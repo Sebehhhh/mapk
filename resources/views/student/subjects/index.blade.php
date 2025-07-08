@@ -13,6 +13,17 @@
                     </button>
                 </div>
 
+                @if ($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
                 {{-- Filter --}}
                 <form method="GET" class="row g-2 mb-3">
                     <div class="col-md-3">
@@ -98,14 +109,13 @@
         </div>
     </div>
 </div>
-
-{{-- Modal Assign Mapel ke Siswa --}}
+{{-- Modal Assign Mapel ke Siswa (Batch) --}}
 <div class="modal fade" id="modalAssignSubject" tabindex="-1">
     <div class="modal-dialog modal-lg">
-        <form class="modal-content" method="POST" action="{{ route('subject-users.store') }}">
+        <form class="modal-content" method="POST" action="{{ route('subject-users.store-batch') }}">
             @csrf
             <div class="modal-header">
-                <h5 class="modal-title">Tambah Mapel ke Siswa</h5>
+                <h5 class="modal-title">Tambah Mapel ke Siswa (Batch)</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body row g-3">
@@ -118,13 +128,21 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Mata Pelajaran</label>
-                    <select name="subject_id" class="form-select" required>
-                        <option value="">Pilih Mapel</option>
-                        @foreach($subjects as $subject)
-                        <option value="{{ $subject->id }}">{{ $subject->name }} ({{ $subject->semester }}, {{
-                            $subject->class_level }})</option>
+                <div class="col-md-2">
+                    <label class="form-label">Kelas</label>
+                    <select id="classLevelSelect" name="class_level" class="form-select" required>
+                        <option value="">Pilih Kelas</option>
+                        @foreach($availableClasses as $class)
+                            <option value="{{ $class }}">{{ $class }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Semester</label>
+                    <select id="semesterSelect" name="semester" class="form-select" required>
+                        <option value="">Pilih Semester</option>
+                        @foreach($availableSemesters as $smt)
+                            <option value="{{ $smt }}">{{ ucfirst($smt) }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -134,6 +152,15 @@
                         value="{{ old('year', date('Y')) }}" required>
                 </div>
             </div>
+            <div class="modal-body row g-3">
+                <div class="col-12">
+                    <label class="form-label">Pilih Mapel</label>
+                    <div id="mapelCheckboxList">
+                        {{-- AJAX mapel akan muncul di sini --}}
+                        <small class="text-muted">Pilih kelas dan semester dulu untuk memunculkan mapel.</small>
+                    </div>
+                </div>
+            </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                 <button type="submit" class="btn btn-primary">Simpan</button>
@@ -141,26 +168,40 @@
         </form>
     </div>
 </div>
-
-<script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    function confirmDelete(pivotId) {
-        Swal.fire({
-            title: 'Yakin ingin menghapus mapel dari siswa ini?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Ya, Hapus'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Ubah action form ke route destroy resource
-                const form = document.getElementById('deleteForm');
-                form.action = `/subject-users/${pivotId}`;
-                form.submit();
-            }
-        });
+    document.getElementById('classLevelSelect').addEventListener('change', loadSubjects);
+    document.getElementById('semesterSelect').addEventListener('change', loadSubjects);
+
+    function loadSubjects() {
+        const kelas = document.getElementById('classLevelSelect').value;
+        const semester = document.getElementById('semesterSelect').value;
+        const el = document.getElementById('mapelCheckboxList');
+        if (!kelas || !semester) {
+            el.innerHTML = '<small class="text-muted">Pilih kelas dan semester dulu.</small>';
+            return;
+        }
+        fetch(`/get-mapel?class_level=${kelas}&semester=${semester}`)
+            .then(response => response.json())
+            .then(resp => {
+                let data = resp.data ?? resp; // Support both: API response (object) and direct array
+                if (!Array.isArray(data) || data.length === 0) {
+                    el.innerHTML = '<div class="text-danger">Tidak ada mapel.</div>';
+                } else {
+                    let html = '';
+                    data.forEach(mp => {
+                        html += `
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" name="subject_ids[]" value="${mp.id}" id="mp${mp.id}">
+                              <label class="form-check-label" for="mp${mp.id}">${mp.name}</label>
+                            </div>
+                        `;
+                    });
+                    el.innerHTML = html;
+                }
+            })
+            .catch(() => {
+                el.innerHTML = '<div class="text-danger">Gagal load data mapel.</div>';
+            });
     }
 </script>
 @endsection
