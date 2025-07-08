@@ -24,7 +24,7 @@ Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/', [HomeController::class, 'index']);
-
+Route::get('/exam-cards/download-pdf', [ExamCardController::class, 'downloadPdf'])->name('exam-cards.download-pdf');
 // Rute Dashboard Umum (admin & siswa bisa akses)
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -36,6 +36,8 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/student-profile/update-photo', [ProfileController::class, 'updatePhoto'])->name('student-profile.update-photo');
     Route::resource('exam-cards', ExamCardController::class);
     Route::resource('pengumuman', PengumumanController::class);
+
+    
 });
 
 // Rute Admin Only

@@ -8,7 +8,8 @@
       <div class="card-body">
         <div class="d-md-flex align-items-center justify-content-between">
           <h4 class="card-title">Manajemen Kartu Ujian</h4>
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createExamCardModal">Tambah Kartu Ujian</button>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createExamCardModal">Tambah Kartu
+            Ujian</button>
         </div>
 
         <div class="table-responsive mt-4">
@@ -16,6 +17,7 @@
             <thead>
               <tr>
                 <th>No</th>
+                <th>No Peserta</th> <!-- Tambahan -->
                 <th>Nama Siswa</th>
                 <th>Jenis Ujian</th>
                 <th>Semester</th>
@@ -28,6 +30,15 @@
               @forelse($examCards as $examCard)
               <tr>
                 <td>{{ $loop->iteration + ($examCards->currentPage() - 1) * $examCards->perPage() }}</td>
+                <td>
+                  {{
+                    strtoupper(substr($examCard->student->class->name ?? 'X', 0, 1))
+                    . '-' .
+                    $examCard->year
+                    . 
+                    str_pad($examCard->student_id, 4, '0', STR_PAD_LEFT)
+                  }}
+                </td>
                 <td>{{ $examCard->student->user->name ?? 'N/A' }}</td>
                 <td>{{ $examCard->exam_type }}</td>
                 <td>{{ $examCard->semester }}</td>
@@ -40,7 +51,7 @@
               </tr>
               @empty
               <tr>
-                <td colspan="7" class="text-center">Belum ada data kartu ujian.</td>
+                <td colspan="8" class="text-center">Belum ada data kartu ujian.</td>
               </tr>
               @endforelse
             </tbody>
@@ -67,7 +78,7 @@
           <select name="student_id" class="form-control" required>
             <option value="">Pilih Siswa</option>
             @foreach($students as $student)
-              <option value="{{ $student->id }}">{{ $student->user->name }}</option>
+            <option value="{{ $student->id }}">{{ $student->user->name }}</option>
             @endforeach
           </select>
         </div>
@@ -121,9 +132,9 @@
           <label>Nama Siswa</label>
           <select name="student_id" class="form-control" required>
             @foreach($students as $student)
-              <option value="{{ $student->id }}" {{ $examCard->student_id == $student->id ? 'selected' : '' }}>
-                {{ $student->user->name }}
-              </option>
+            <option value="{{ $student->id }}" {{ $examCard->student_id == $student->id ? 'selected' : '' }}>
+              {{ $student->user->name }}
+            </option>
             @endforeach
           </select>
         </div>

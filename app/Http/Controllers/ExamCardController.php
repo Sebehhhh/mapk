@@ -4,11 +4,30 @@ namespace App\Http\Controllers;
 
 use App\Models\ExamCard;
 use App\Models\Student;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ExamCardController extends Controller
 {
+    public function downloadPdf()
+    {
+        $user = auth()->user();
+        if ($user->role == 'admin') {
+            $examCards = ExamCard::with(['student.user'])->get();
+        } else {
+            $examCards = ExamCard::with(['student.user'])
+                ->where('student_id', $user->student->id)
+                ->get();
+        }
+
+        // Tampilkan PDF di browser (tidak auto-download)
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exam-cards.pdf', compact('examCards'))
+            ->setPaper('A4', 'portrait');
+
+        return $pdf->stream('kartu_ujian_' . date('Y-m-d') . '.pdf');
+    }
+
     public function index()
     {
         $examCards = ExamCard::with('student.user')->orderBy('created_at', 'desc')->paginate(10);
@@ -76,6 +95,4 @@ class ExamCardController extends Controller
 
         return redirect()->route('exam-cards.index')->with('success', 'Kartu ujian berhasil dihapus.');
     }
-
-    
 }

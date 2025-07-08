@@ -82,8 +82,8 @@
 
 {{-- Tombol Print --}}
 <div class="d-flex justify-content-end mb-3 no-print">
-  <button class="btn btn-success" onclick="window.print()">
-    <i class="bi bi-printer"></i> Cetak Semua
+  <button onclick="window.print()" class="btn btn-danger no-print mb-3">
+    <i class="bi bi-printer"></i> Print
   </button>
 </div>
 
@@ -98,10 +98,17 @@
   </div>
   <hr style="border-top: 2.5px solid #111; margin:12px 0 15px 0;">
   <div class="data-siswa">
-    Nomor Peserta : <span style="font-weight:400;">{{ $card->student->id }}</span><br>
+    @php
+    $kelas = strtoupper(substr($card->student->class->name ?? 'X', 0, 1)); // Misal 'A', 'B', dst.
+    $tahun = $card->year;
+    $idSiswa = str_pad($card->student->id, 4, '0', STR_PAD_LEFT); // ex: 0123
+    $noPeserta = "{$kelas}-{$tahun}{$idSiswa}";
+    @endphp
+    Nomor Peserta : <span style="font-weight:400;">{{ $noPeserta }}</span><br>
     Nama : <span style="font-weight:400;">{{ $card->student->user->name }}</span><br>
-    Kelas : <span style="font-weight:400;">{{ $card->student->class }}</span><br>
+    Kelas : <span style="font-weight:400;">{{ $kelas ?? '-' }}</span><br>
     Jenis Ujian : <span style="font-weight:400;">{{ $card->exam_type }}</span><br>
+    Semester : <span style="font-weight:400;">{{ $card->semester ?? '-' }}</span><br>
     Tahun Ajaran : <span style="font-weight:400;">{{ $card->year }}</span>
   </div>
 </div>
