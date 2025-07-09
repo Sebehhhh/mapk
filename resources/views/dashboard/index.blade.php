@@ -162,7 +162,7 @@ new Chart(document.getElementById('genderChart'), {
       </div>
     </div>
 
-    <div class="row">
+    {{-- <div class="row">
       <div class="col-md-4 mb-3">
         <div class="card text-center shadow-sm">
           <div class="card-body">
@@ -190,7 +190,7 @@ new Chart(document.getElementById('genderChart'), {
           </div>
         </div>
       </div>
-    </div>
+    </div> --}}
 
     <div class="card shadow-sm mt-4">
       <div class="card-body">
