@@ -13,6 +13,7 @@ use App\Http\Controllers\ScoreController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StudentParentController;
+use App\Http\Controllers\StudentProgressController;
 use App\Http\Controllers\StudentSubjectController;
 use App\Http\Controllers\SubjectController;
 use App\Models\Subject;
@@ -50,7 +51,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('scores/store-multi', [ScoreController::class, 'storeMulti'])->name('scores.store-multi');
     Route::resource('subject-users', StudentSubjectController::class);
     Route::get('/rekap-ranking', [ScoreController::class, 'rekap'])->name('scores.rekap');
-
+    Route::resource('student-progresses', StudentProgressController::class);
     // Manajemen Homepage
     Route::resource('heroes', HeroController::class);
     Route::resource('extracurriculars', ExtracurricularController::class);

@@ -60,4 +60,15 @@ class Student extends Model
     {
         return $this->hasOne(StudentParent::class);
     }
+
+    public function progresses()
+    {
+        return $this->hasMany(StudentProgress::class);
+    }
+
+    // Ambil progress terakhir via relasi
+    public function lastProgress()
+    {
+        return $this->progresses()->terakhir()->first();
+    }
 }

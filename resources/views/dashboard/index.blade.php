@@ -161,6 +161,7 @@ new Chart(document.getElementById('genderChart'), {
         </div>
       </div>
     </div>
+
     <div class="row">
       <div class="col-md-4 mb-3">
         <div class="card text-center shadow-sm">
@@ -190,40 +191,35 @@ new Chart(document.getElementById('genderChart'), {
         </div>
       </div>
     </div>
+
     <div class="card shadow-sm mt-4">
       <div class="card-body">
-        <h5 class="card-title mb-2">Grafik Rata-rata Nilai Akhir per Semester</h5>
-        <canvas id="nilaiChart"></canvas>
+        <h5 class="card-title mb-3">Histori Nilai Akhir per Kelas & Semester</h5>
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover">
+            <thead class="table-light text-center">
+              <tr>
+                <th>Kelas</th>
+                <th>Semester</th>
+                <th>Nilai Rata-rata</th>
+              </tr>
+            </thead>
+            <tbody class="text-center">
+              @foreach($historiNilai as $item)
+                <tr>
+                  <td>{{ $item['kelas'] }}</td>
+                  <td>{{ ucfirst($item['semester']) }}</td>
+                  <td>{{ $item['nilai'] }}</td>
+                </tr>
+              @endforeach
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
+
   </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-      var nilaiData = @json($nilaiData);
-      new Chart(document.getElementById('nilaiChart'), {
-        type: 'line',
-        data: {
-          labels: nilaiData.labels,
-          datasets: [{
-            label: 'Nilai Rata-rata',
-            data: nilaiData.data,
-            borderColor: 'rgba(24,78,189,1)',
-            backgroundColor: 'rgba(24,78,189,0.1)',
-            fill: true,
-            tension: 0.4,
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true, stepSize: 1 } }
-        }
-      });
-    });
-</script>
 @endif
 
 

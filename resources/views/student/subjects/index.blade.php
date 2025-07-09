@@ -14,14 +14,14 @@
                 </div>
 
                 @if ($errors->any())
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <ul class="mb-0">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
                 @endif
 
                 {{-- Filter --}}
@@ -78,7 +78,8 @@
                         <tbody>
                             @forelse($subjectUsers as $item)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ ($subjectUsers->currentPage() - 1) * $subjectUsers->perPage() + $loop->iteration
+                                    }}</td>
                                 <td>{{ $item->user->name ?? '-' }}</td>
                                 <td>{{ $item->user->student->nisn ?? '-' }}</td>
                                 <td>{{ $item->subject->class_level ?? '-' }}</td>
@@ -103,6 +104,8 @@
                             @endforelse
                         </tbody>
                     </table>
+                    {{-- Pagination Bootstrap 4 --}}
+                    {{ $subjectUsers->links("pagination::bootstrap-4") }}
                 </div>
 
             </div>
@@ -133,7 +136,7 @@
                     <select id="classLevelSelect" name="class_level" class="form-select" required>
                         <option value="">Pilih Kelas</option>
                         @foreach($availableClasses as $class)
-                            <option value="{{ $class }}">{{ $class }}</option>
+                        <option value="{{ $class }}">{{ $class }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -142,7 +145,7 @@
                     <select id="semesterSelect" name="semester" class="form-select" required>
                         <option value="">Pilih Semester</option>
                         @foreach($availableSemesters as $smt)
-                            <option value="{{ $smt }}">{{ ucfirst($smt) }}</option>
+                        <option value="{{ $smt }}">{{ ucfirst($smt) }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -203,5 +206,31 @@
                 el.innerHTML = '<div class="text-danger">Gagal load data mapel.</div>';
             });
     }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmDelete(id) {
+    Swal.fire({
+        title: 'Yakin ingin menghapus mapping ini?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Ya, Hapus'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Buat form dinamis
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/subject-users/' + id;
+            form.innerHTML = `
+                @csrf
+                @method('DELETE')
+            `;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+}
 </script>
 @endsection

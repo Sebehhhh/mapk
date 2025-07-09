@@ -146,7 +146,7 @@ class StudentSubjectController extends Controller
         if ($selectedYear) $pivotQuery->where('year', $selectedYear);
         if ($selectedSemester) $pivotQuery->whereHas('subject', fn($q) => $q->where('semester', $selectedSemester));
         if ($selectedClass) $pivotQuery->whereHas('subject', fn($q) => $q->where('class_level', $selectedClass));
-        $subjectUsers = $pivotQuery->with(['user', 'subject'])->get();
+        $subjectUsers = $pivotQuery->with(['user', 'subject'])->paginate(10)->withQueryString();
 
         // Dropdown Tahun
         $availableYears = \App\Models\SubjectUser::distinct()->pluck('year')->unique()->sort()->values();

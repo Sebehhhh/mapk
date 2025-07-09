@@ -105,6 +105,8 @@
                 Siswa</a></li>
             <li><a class="sidebar-link" href="{{ route('scores.index') }}"><i class="ti ti-chart-bar"></i> Nilai</a>
             </li>
+            <li><a class="sidebar-link" href="{{ route('student-progresses.index') }}"><i class="ti ti-trending-up"></i>
+                Progress Siswa</a></li>
             <li><a class="sidebar-link" href="{{ route('exam-cards.index') }}"><i class="ti ti-id-badge"></i> Kartu
                 Ulangan</a></li>
             <li><a class="sidebar-link" href="{{ route('scores.rekap') }}"><i class="ti ti-award"></i> Rekap Ranking</a>
