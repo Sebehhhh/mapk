@@ -8,45 +8,30 @@ use Illuminate\Support\Facades\Storage;
 
 class AboutController extends Controller
 {
-    // Tampil halaman utama (tabel + modal)
+    // Tampil halaman utama
     public function index()
     {
         $about = About::first();
         return view('abouts.index', compact('about'));
     }
 
-    // Simpan data baru (handle form modal)
+    // Simpan profil baru (maksimal satu)
     public function store(Request $request)
     {
-        if (About::count() > 0) {
-            return redirect()->route('abouts.index')->with('error', 'Profil sudah ada. Tidak boleh lebih dari satu.');
+        if (About::exists()) {
+            return redirect()
+                ->route('abouts.index')
+                ->with('error', 'Profil sudah ada. Tidak boleh lebih dari satu.');
         }
 
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
+            'title'       => 'required|string|max:255',
             'description' => 'required|string',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'vision' => 'nullable|string',
-            'mission' => 'nullable|string',
-            'address' => 'nullable|string|max:255',
-            'latitude' => 'nullable|string|max:20',
-            'longitude' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255',
-            'phone' => 'nullable|string|max:50',
-            'whatsapp' => 'nullable|string|max:50',
-            'website' => 'nullable|string|max:255',
-            'instagram' => 'nullable|string|max:255',
-            'facebook' => 'nullable|string|max:255',
-            'youtube' => 'nullable|string|max:255',
-            'tiktok' => 'nullable|string|max:255',
-            'kepala_sekolah' => 'nullable|string|max:255',
-            'nip_kepsek' => 'nullable|string|max:255',
-            'tahun_berdiri' => 'nullable|string|max:8',
-            'akreditasi' => 'nullable|string|max:10',
-            'jumlah_siswa' => 'nullable|integer',
-            'jumlah_guru' => 'nullable|integer',
-            'fasilitas' => 'nullable|string',
-            'struktur_organisasi' => 'nullable|string|max:255',
+            'photo'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'address'     => 'nullable|string|max:255',
+            'instagram'   => 'nullable|string|max:255',
+            'akreditasi'  => 'nullable|string|max:10',
+            'email'       => 'nullable|email|max:255',
         ]);
 
         $photoPath = null;
@@ -54,44 +39,36 @@ class AboutController extends Controller
             $photoPath = $request->file('photo')->store('abouts', 'public');
         }
 
-        About::create(array_merge($validated, ['photo' => $photoPath]));
+        About::create([
+            'title'       => $validated['title'],
+            'description' => $validated['description'],
+            'photo'       => $photoPath,
+            'address'     => $validated['address']   ?? null,
+            'instagram'   => $validated['instagram'] ?? null,
+            'akreditasi'  => $validated['akreditasi'] ?? null,
+            'email'       => $validated['email']     ?? null,
+        ]);
 
-        return redirect()->route('abouts.index')->with('success', 'Profil sekolah berhasil dibuat.');
+        return redirect()
+            ->route('abouts.index')
+            ->with('success', 'Profil sekolah berhasil dibuat.');
     }
 
-    // Update profil (handle form modal)
+    // Perbarui profil
     public function update(Request $request, $id)
     {
         $about = About::findOrFail($id);
 
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
+            'title'       => 'required|string|max:255',
             'description' => 'required|string',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'vision' => 'nullable|string',
-            'mission' => 'nullable|string',
-            'address' => 'nullable|string|max:255',
-            'latitude' => 'nullable|string|max:20',
-            'longitude' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255',
-            'phone' => 'nullable|string|max:50',
-            'whatsapp' => 'nullable|string|max:50',
-            'website' => 'nullable|string|max:255',
-            'instagram' => 'nullable|string|max:255',
-            'facebook' => 'nullable|string|max:255',
-            'youtube' => 'nullable|string|max:255',
-            'tiktok' => 'nullable|string|max:255',
-            'kepala_sekolah' => 'nullable|string|max:255',
-            'nip_kepsek' => 'nullable|string|max:255',
-            'tahun_berdiri' => 'nullable|string|max:8',
-            'akreditasi' => 'nullable|string|max:10',
-            'jumlah_siswa' => 'nullable|integer',
-            'jumlah_guru' => 'nullable|integer',
-            'fasilitas' => 'nullable|string',
-            'struktur_organisasi' => 'nullable|string|max:255',
+            'photo'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'address'     => 'nullable|string|max:255',
+            'instagram'   => 'nullable|string|max:255',
+            'akreditasi'  => 'nullable|string|max:10',
+            'email'       => 'nullable|email|max:255',
         ]);
 
-        // Handle update foto/logo
         if ($request->hasFile('photo')) {
             if ($about->photo && Storage::disk('public')->exists($about->photo)) {
                 Storage::disk('public')->delete($about->photo);
@@ -99,20 +76,34 @@ class AboutController extends Controller
             $about->photo = $request->file('photo')->store('abouts', 'public');
         }
 
-        $about->fill($validated);
+        $about->fill([
+            'title'       => $validated['title'],
+            'description' => $validated['description'],
+            'address'     => $validated['address']   ?? null,
+            'instagram'   => $validated['instagram'] ?? null,
+            'akreditasi'  => $validated['akreditasi'] ?? null,
+            'email'       => $validated['email']     ?? null,
+        ]);
         $about->save();
 
-        return redirect()->route('abouts.index')->with('success', 'Profil sekolah berhasil diperbarui.');
+        return redirect()
+            ->route('abouts.index')
+            ->with('success', 'Profil sekolah berhasil diperbarui.');
     }
 
-    // Hapus profil (opsional, biasanya tidak dipakai)
+    // Hapus profil (opsional)
     public function destroy($id)
     {
         $about = About::findOrFail($id);
+
         if ($about->photo && Storage::disk('public')->exists($about->photo)) {
             Storage::disk('public')->delete($about->photo);
         }
+
         $about->delete();
-        return redirect()->route('abouts.index')->with('success', 'Profil sekolah berhasil dihapus.');
+
+        return redirect()
+            ->route('abouts.index')
+            ->with('success', 'Profil sekolah berhasil dihapus.');
     }
 }

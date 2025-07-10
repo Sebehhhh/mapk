@@ -22,7 +22,7 @@ class ExtracurricularController extends Controller
             'name'        => 'required|string|max:100',
             'description' => 'required|string',
             'photo'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'is_active'   => 'required|boolean',
+            // 'is_active'   => 'required|boolean',
         ]);
 
         $photoPath = null;
@@ -34,7 +34,7 @@ class ExtracurricularController extends Controller
             'name'        => $validated['name'],
             'description' => $validated['description'],
             'photo'       => $photoPath,
-            'is_active'   => $validated['is_active'],
+            // 'is_active'   => $validated['is_active'],
         ]);
 
         return redirect()->route('extracurriculars.index')->with('success', 'Ekstrakurikuler berhasil ditambahkan.');
@@ -49,7 +49,7 @@ class ExtracurricularController extends Controller
             'name'        => 'required|string|max:100',
             'description' => 'required|string',
             'photo'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'is_active'   => 'required|boolean',
+            // 'is_active'   => 'required|boolean',
         ]);
 
         // Foto baru?

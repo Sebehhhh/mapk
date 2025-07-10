@@ -22,7 +22,9 @@
           <div class="col-sm-10 col-12 col-md-8 col-lg-6 col-xxl-3">
             <div class="card mb-0 shadow-lg border-0 rounded-4">
               <div class="card-body" style="background: linear-gradient(135deg,#f6f7fb 60%,#e0eafc 100%);">
-                </a>
+                <div class="text-center mb-3">
+                  <img src="{{ asset('assets/images/logos/logo.png') }}" alt="Logo MAPK NU Haruyan" style="width:80px; height:80px; object-fit:contain;">
+                </div>
                 <h4 class="text-center fw-bolder mb-4" style="color:#184ebd;letter-spacing:0.5px;">Sistem Informasi
                   Akademik<br>MAPK NU Haruyan</h4>
 

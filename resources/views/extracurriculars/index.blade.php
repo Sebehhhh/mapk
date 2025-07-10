@@ -38,7 +38,6 @@
                 <th>Logo</th>
                 <th>Nama</th>
                 <th>Deskripsi</th>
-                <th>Status</th>
                 <th>Aksi</th>
               </tr>
             </thead>
@@ -59,11 +58,6 @@
                   <div style="white-space:pre-line;overflow:hidden;text-overflow:ellipsis;">{{ Str::limit(strip_tags($ekstra->description), 60) }}</div>
                 </td>
                 <td>
-                  <span class="badge bg-{{ $ekstra->is_active ? 'success' : 'secondary' }}">
-                    {{ $ekstra->is_active ? 'Aktif' : 'Tidak Aktif' }}
-                  </span>
-                </td>
-                <td>
                   <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
                     data-bs-target="#editEkstraModal{{ $ekstra->id }}">
                     <span class="iconify" data-icon="mdi:pencil" data-width="18"></span> Edit
@@ -75,7 +69,7 @@
               </tr>
               @empty
               <tr>
-                <td colspan="6" class="text-center text-muted">Belum ada data ekstrakurikuler.</td>
+                <td colspan="5" class="text-center text-muted">Belum ada data ekstrakurikuler.</td>
               </tr>
               @endforelse
             </tbody>
@@ -122,13 +116,6 @@
           <label>Deskripsi</label>
           <textarea name="description" class="form-control" rows="3" required>{{ $ekstra->description }}</textarea>
         </div>
-        <div class="mb-3">
-          <label>Status</label>
-          <select name="is_active" class="form-control" required>
-            <option value="1" {{ $ekstra->is_active ? 'selected' : '' }}>Aktif</option>
-            <option value="0" {{ !$ekstra->is_active ? 'selected' : '' }}>Tidak Aktif</option>
-          </select>
-        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -164,13 +151,6 @@
         <div class="mb-3">
           <label>Deskripsi</label>
           <textarea name="description" class="form-control" rows="3" required></textarea>
-        </div>
-        <div class="mb-3">
-          <label>Status</label>
-          <select name="is_active" class="form-control" required>
-            <option value="1">Aktif</option>
-            <option value="0">Tidak Aktif</option>
-          </select>
         </div>
       </div>
       <div class="modal-footer">
