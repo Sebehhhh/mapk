@@ -2,6 +2,9 @@
 @section('title', 'Manajemen Orang Tua')
 @section('content')
 
+<!-- SweetAlert2 CDN (or use your asset pipeline as needed) -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <div class="row">
     <div class="col-lg-12">
         <div class="card w-100">
@@ -55,11 +58,11 @@
                                     <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
                                         data-bs-target="#editParentModal{{ $parent->id }}">Edit</button>
                                     <form method="POST" action="{{ route('student-parents.destroy', $parent->id) }}"
-                                        style="display:inline;">
+                                        style="display:inline;" class="form-delete-parent" id="form-delete-parent-{{ $parent->id }}">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm"
-                                            onclick="return confirm('Yakin ingin menghapus data ini?')">Hapus</button>
+                                        <button type="button" class="btn btn-danger btn-sm btn-delete-parent"
+                                            data-id="{{ $parent->id }}">Hapus</button>
                                     </form>
                                 </td>
                             </tr>
@@ -186,4 +189,30 @@
         </form>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Event delegation for delete buttons
+        document.querySelectorAll('.btn-delete-parent').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                var parentId = this.getAttribute('data-id');
+                Swal.fire({
+                    title: 'Yakin ingin menghapus data ini?',
+                    text: "Data yang dihapus tidak dapat dikembalikan.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById('form-delete-parent-' + parentId).submit();
+                    }
+                });
+            });
+        });
+    });
+</script>
 @endsection
