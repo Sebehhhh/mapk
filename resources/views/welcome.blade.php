@@ -137,7 +137,10 @@
                 <ul>
                     <li><strong>Akreditasi:</strong> {{ $about->akreditasi ?? '-' }}</li>
                     <li><strong>Alamat:</strong> {{ $about->address ?? '-' }}</li>
-                    <li><strong>Visi:</strong> {{ $about->vision ?? '-' }}</li>
+                    <li><strong>Email:</strong> {{ $about->email ?? '-' }}</li>
+                    @if($about && $about->instagram)
+                        <li><strong>Instagram:</strong> <a href="https://instagram.com/{{ ltrim($about->instagram, '@') }}" target="_blank">{{ $about->instagram }}</a></li>
+                    @endif
                 </ul>
             </div>
             <div class="col-md-6">
@@ -160,23 +163,9 @@
         <div class="row justify-content-center">
             <div class="col-md-6 mb-4 d-flex flex-column justify-content-center">
                 <div class="mb-2"><i class="bi bi-geo-alt"></i> {{ $about->address ?? '-' }}</div>
-                <div class="mb-2"><i class="bi bi-telephone"></i> {{ $about->phone ?? '-' }}</div>
                 <div class="mb-2"><i class="bi bi-envelope"></i> {{ $about->email ?? '-' }}</div>
-                @if($about->website)
-                <div class="mb-2"><i class="bi bi-globe"></i> <a href="{{ $about->website }}" target="_blank">{{
-                        $about->website }}</a></div>
-                @endif
-                @if($about->whatsapp)
-                <div class="mb-2"><i class="bi bi-whatsapp"></i> {{ $about->whatsapp }}</div>
-                @endif
-                @if($about->instagram)
-                <div class="mb-2"><i class="bi bi-instagram"></i> <a
-                        href="https://instagram.com/{{ ltrim($about->instagram, '@') }}" target="_blank">{{
-                        $about->instagram }}</a></div>
-                @endif
-                @if($about->facebook)
-                <div class="mb-2"><i class="bi bi-facebook"></i> <a href="https://facebook.com/{{ $about->facebook }}"
-                        target="_blank">{{ $about->facebook }}</a></div>
+                @if($about && $about->instagram)
+                <div class="mb-2"><i class="bi bi-instagram"></i> <a href="https://instagram.com/{{ ltrim($about->instagram, '@') }}" target="_blank">{{ $about->instagram }}</a></div>
                 @endif
             </div>
             <div class="col-md-6 mb-4">
