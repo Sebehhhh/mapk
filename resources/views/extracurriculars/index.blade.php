@@ -116,6 +116,7 @@
           <label>Deskripsi</label>
           <textarea name="description" class="form-control" rows="3" required>{{ $ekstra->description }}</textarea>
         </div>
+        {{-- Tidak ada field is_active, jadi tidak perlu input/select untuk is_active di sini --}}
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>

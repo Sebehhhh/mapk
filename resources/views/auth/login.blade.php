@@ -23,7 +23,9 @@
             <div class="card mb-0 shadow-lg border-0 rounded-4">
               <div class="card-body" style="background: linear-gradient(135deg,#f6f7fb 60%,#e0eafc 100%);">
                 <div class="text-center mb-3">
+                  <!-- LOGO LOGIN START -->
                   <img src="{{ asset('assets/images/logos/logo.png') }}" alt="Logo MAPK NU Haruyan" style="width:80px; height:80px; object-fit:contain;">
+                  <!-- LOGO LOGIN END -->
                 </div>
                 <h4 class="text-center fw-bolder mb-4" style="color:#184ebd;letter-spacing:0.5px;">Sistem Informasi
                   Akademik<br>MAPK NU Haruyan</h4>

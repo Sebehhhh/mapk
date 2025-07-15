@@ -1,5 +1,7 @@
 <style>
-  /* Sidebar link: Hover & Aktif (Hijau) */
+  /* Sidebar link: Hover & Aktif (Hijau)
+     Efek hijau pada sidebar-link saat hover, focus, atau aktif menggunakan background-color: #27ae60 (hijau),
+     warna teks putih, dan border-radius. Efek ini juga berlaku pada ikon di dalam link. */
   .sidebar-link:hover,
   .sidebar-link.active,
   .sidebar-item.active>.sidebar-link,

@@ -90,9 +90,11 @@
                     data-bs-target="#editUserModal{{ $user->id }}">
                     <span class="iconify" data-icon="mdi:pencil" data-width="18"></span> Edit
                   </button>
+                  @if($user->role !== 'admin')
                   <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ $user->id }})">
                     <span class="iconify" data-icon="mdi:delete" data-width="18"></span> Hapus
                   </button>
+                  @endif
                 </td>
               </tr>
               @endforeach

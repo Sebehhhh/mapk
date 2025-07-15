@@ -4,7 +4,7 @@
 
 <div class="card shadow mb-4">
     <div class="card-header d-flex justify-content-between align-items-center bg-light">
-        <h4 class="fw-bold mb-0"><i class="ti ti-award me-2"></i>Rekap Ranking Siswa</h4>
+        <h4 class="fw-bold mb-0"><i class="ti ti-award me-2"></i>Rekap Ranking Siswa <span class="text-muted fs-6">({{ $year }})</span></h4>
         <form method="get" class="d-flex gap-2 mb-0">
             <select class="form-select" name="kelas" style="width:auto;" onchange="this.form.submit()">
                 @foreach($availableClasses as $cls)
@@ -16,7 +16,15 @@
                     <option value="{{ $key }}" {{ $semester==$key ? 'selected' : '' }}>{{ $label }}</option>
                 @endforeach
             </select>
+            <select class="form-select" name="year" style="width:auto;" onchange="this.form.submit()">
+                @foreach($availableYears as $thn)
+                    <option value="{{ $thn }}" {{ $year==$thn ? 'selected' : '' }}>{{ $thn }}</option>
+                @endforeach
+            </select>
         </form>
+        <a href="{{ route('scores.rekap.pdf', ['kelas' => $kelas, 'semester' => $semester, 'year' => $year]) }}" target="_blank" class="btn btn-danger ms-2">
+            <i class="ti ti-file-type-pdf me-1"></i> Cetak PDF
+        </a>
     </div>
     <div class="card-body bg-light">
         @if(empty($rekap))
@@ -45,11 +53,35 @@
                         <td>
                             @php
                                 $allComplete = true;
-                                foreach ($row['siswa']->scores as $score) {
-                                    if ($score->semester == $row['semester'] && $score->subject->class_level == $row['kelas'] && !$score->isComplete()) {
-                                        $allComplete = false;
-                                        break;
+                                $hasScores = false;
+                                
+                                // Helper function to match year formats
+                                $matchYear = function($scoreYear, $progressYear) {
+                                    if ($scoreYear == $progressYear) return true;
+                                    if (strpos($progressYear, '/') !== false) {
+                                        return $scoreYear == substr($progressYear, -4);
                                     }
+                                    if (strpos($scoreYear, '/') !== false) {
+                                        return substr($scoreYear, -4) == $progressYear;
+                                    }
+                                    return false;
+                                };
+                                
+                                foreach ($row['siswa']->scores as $score) {
+                                    if ($score->semester == $row['semester'] && 
+                                        $score->subject->class_level == $row['kelas'] && 
+                                        $matchYear($score->year, $row['year'])) {
+                                        $hasScores = true;
+                                        if (!$score->isComplete()) {
+                                            $allComplete = false;
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                                // If no scores found, consider not complete
+                                if (!$hasScores) {
+                                    $allComplete = false;
                                 }
                             @endphp
                             @if($allComplete && $row['avg'] > 0)

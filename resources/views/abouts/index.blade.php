@@ -79,13 +79,6 @@
                   <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editAboutModal">
                     <span class="iconify" data-icon="mdi:pencil" data-width="18"></span>
                   </button>
-                  <form action="{{ route('abouts.destroy', $about->id) }}" method="POST" class="d-inline"
-                    onsubmit="return confirm('Yakin hapus profil?');">
-                    @csrf @method('DELETE')
-                    <button type="submit" class="btn btn-danger btn-sm">
-                      <span class="iconify" data-icon="mdi:delete" data-width="18"></span>
-                    </button>
-                  </form>
                 </td>
               </tr>
               @else

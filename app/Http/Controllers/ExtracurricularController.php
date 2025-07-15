@@ -62,7 +62,7 @@ class ExtracurricularController extends Controller
 
         $ekstra->name        = $validated['name'];
         $ekstra->description = $validated['description'];
-        $ekstra->is_active   = $validated['is_active'];
+        // $ekstra->is_active   = $validated['is_active'];
         $ekstra->save();
 
         return redirect()->route('extracurriculars.index')->with('success', 'Ekstrakurikuler berhasil diupdate.');

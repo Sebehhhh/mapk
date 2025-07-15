@@ -65,7 +65,9 @@ class Score extends Model
      */
     public function isComplete()
     {
-        return !is_null($this->attendance) && !is_null($this->assignment) && 
-               !is_null($this->mid_exam) && !is_null($this->final_exam);
+        return !is_null($this->attendance) && $this->attendance !== ''
+            && !is_null($this->assignment) && $this->assignment !== ''
+            && !is_null($this->mid_exam) && $this->mid_exam !== ''
+            && !is_null($this->final_exam) && $this->final_exam !== '';
     }
 }

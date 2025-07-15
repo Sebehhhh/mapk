@@ -7,6 +7,7 @@ use App\Models\Student;
 use App\Models\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\StudentProgress;
 
 class ScoreController extends Controller
 {
@@ -99,7 +100,13 @@ class ScoreController extends Controller
         try {
             $subject = Subject::findOrFail($validatedData['subject_id']);
             $validatedData['semester'] = $subject->semester;
-            $validatedData['year'] = date('Y');
+            // Cari tahun ajaran dari StudentProgress aktif
+            $progress = StudentProgress::where('student_id', $validatedData['student_id'])
+                ->where('class_level', $subject->class_level)
+                ->where('semester', $subject->semester)
+                ->orderByDesc('year')
+                ->first();
+            $validatedData['year'] = $progress ? $progress->year : date('Y');
 
             // Cek double entry
             $existingScore = Score::where('student_id', $validatedData['student_id'])
@@ -131,51 +138,54 @@ class ScoreController extends Controller
 
         $student_id = $request->student_id;
         $semester = $request->semester;
-        $year = date('Y');
+        // Ambil tahun ajaran dari progress aktif
+        $progress = StudentProgress::where('student_id', $student_id)
+            ->where('semester', $semester)
+            ->orderByDesc('year')
+            ->first();
+        $year = $progress ? $progress->year : date('Y');
 
         foreach ($request->scores as $subject_id => $nilai) {
             // Validasi nilai per mapel - sekarang boleh kosong
             $hasAnyValue = false;
-            
-            // Cek apakah ada nilai yang diisi
             foreach (['attendance', 'assignment', 'mid_exam', 'final_exam'] as $field) {
                 if (isset($nilai[$field]) && $nilai[$field] !== '' && $nilai[$field] !== null) {
                     $hasAnyValue = true;
-                    // Validasi range nilai
                     if ($nilai[$field] < 0 || $nilai[$field] > 100) {
-                        continue 2; // Skip ke subject berikutnya
+                        continue 2;
                     }
                 }
             }
-            
-            // Skip jika tidak ada nilai yang diisi
             if (!$hasAnyValue) {
                 continue;
             }
-
-            // Cek double entry
+            $subject = Subject::find($subject_id);
+            $class_level = $subject ? $subject->class_level : null;
+            // Cari progress untuk mapel ini
+            $progressMapel = StudentProgress::where('student_id', $student_id)
+                ->where('class_level', $class_level)
+                ->where('semester', $semester)
+                ->orderByDesc('year')
+                ->first();
+            $yearMapel = $progressMapel ? $progressMapel->year : $year;
             $exists = Score::where('student_id', $student_id)
                 ->where('subject_id', $subject_id)
                 ->where('semester', $semester)
-                ->where('year', $year)
+                ->where('year', $yearMapel)
                 ->first();
-            if ($exists) continue; // Skip jika sudah ada
-
-            // Prepare data dengan handling null values
+            if ($exists) continue;
             $scoreData = [
                 'student_id' => $student_id,
                 'subject_id' => $subject_id,
                 'semester' => $semester,
-                'year' => $year,
+                'year' => $yearMapel,
                 'attendance' => isset($nilai['attendance']) && $nilai['attendance'] !== '' ? $nilai['attendance'] : null,
                 'assignment' => isset($nilai['assignment']) && $nilai['assignment'] !== '' ? $nilai['assignment'] : null,
                 'mid_exam' => isset($nilai['mid_exam']) && $nilai['mid_exam'] !== '' ? $nilai['mid_exam'] : null,
                 'final_exam' => isset($nilai['final_exam']) && $nilai['final_exam'] !== '' ? $nilai['final_exam'] : null,
             ];
-
             Score::create($scoreData);
         }
-
         return redirect()->route('scores.index')->with('success', 'Nilai berhasil disimpan. Nilai yang kosong akan tetap kosong dan bisa diisi kemudian.');
     }
 
@@ -192,31 +202,31 @@ class ScoreController extends Controller
             'mid_exam'     => 'nullable|integer|min:0|max:100',
             'final_exam'   => 'nullable|integer|min:0|max:100',
         ]);
-
         try {
             $subject = Subject::findOrFail($validatedData['subject_id']);
             $validatedData['semester'] = $subject->semester;
-            $validatedData['year'] = date('Y');
-
+            // Cari tahun ajaran dari StudentProgress aktif
+            $progress = StudentProgress::where('student_id', $validatedData['student_id'])
+                ->where('class_level', $subject->class_level)
+                ->where('semester', $subject->semester)
+                ->orderByDesc('year')
+                ->first();
+            $validatedData['year'] = $progress ? $progress->year : date('Y');
             $existingScore = Score::where('student_id', $validatedData['student_id'])
                 ->where('subject_id', $validatedData['subject_id'])
                 ->where('semester', $validatedData['semester'])
                 ->where('year', $validatedData['year'])
                 ->where('id', '!=', $score->id)
                 ->first();
-
             if ($existingScore) {
                 return redirect()->back()->withInput()->with('error', 'Nilai untuk siswa, mata pelajaran, semester, dan tahun ini sudah ada.');
             }
-
-            // Handle null values for empty inputs
             $updateData = $validatedData;
             foreach (['attendance', 'assignment', 'mid_exam', 'final_exam'] as $field) {
                 if (isset($updateData[$field]) && $updateData[$field] === '') {
                     $updateData[$field] = null;
                 }
             }
-            
             $score->update($updateData);
             return redirect()->route('scores.index')->with('success', 'Nilai berhasil diperbarui!');
         } catch (\Exception $e) {
@@ -266,26 +276,65 @@ class ScoreController extends Controller
     }
 
     /**
+     * Helper method untuk matching tahun dengan format berbeda
+     * Menangani format "2024/2025" vs "2025"
+     */
+    private function matchYear($scoreYear, $progressYear)
+    {
+        // Exact match
+        if ($scoreYear == $progressYear) {
+            return true;
+        }
+        
+        // Handle "2024/2025" format
+        if (strpos($progressYear, '/') !== false) {
+            $endYear = substr($progressYear, -4);
+            return $scoreYear == $endYear;
+        }
+        
+        if (strpos($scoreYear, '/') !== false) {
+            $endYear = substr($scoreYear, -4);
+            return $endYear == $progressYear;
+        }
+        
+        return false;
+    }
+
+    /**
      * Rekap ranking
      */
     public function rekap(Request $request)
     {
         $kelas = $request->input('kelas', 'XII');
         $semester = $request->input('semester', 'genap');
+        $year = $request->input('year'); // Tambahkan filter tahun jika ingin, atau ambil tahun terakhir
 
-        $students = Student::whereHas('scores', function ($q) use ($kelas, $semester) {
-            $q->where('semester', $semester)
-                ->whereHas('subject', function ($q2) use ($kelas) {
-                    $q2->where('class_level', $kelas);
-                });
-        })->with(['user', 'scores.subject'])->get();
+        // Ambil tahun terakhir untuk kelas & semester ini jika tidak dipilih
+        if (!$year) {
+            $year = StudentProgress::where('class_level', $kelas)
+                ->where('semester', $semester)
+                ->orderByDesc('year')
+                ->value('year');
+        }
+
+        // Ambil siswa yang progress-nya sesuai kelas, semester, tahun
+        $progressSiswa = StudentProgress::where('class_level', $kelas)
+            ->where('semester', $semester)
+            ->where('year', $year)
+            ->pluck('student_id');
+
+        $students = Student::whereIn('id', $progressSiswa)
+            ->with(['user', 'scores.subject'])
+            ->get();
 
         $rekap = [];
         foreach ($students as $siswa) {
             $nilaiAkhir = [];
             foreach ($siswa->scores as $score) {
-                if ($score->semester == $semester && $score->subject->class_level == $kelas) {
-                    // Hanya hitung jika semua nilai sudah diisi
+                // Use helper method to match different year formats
+                if ($score->semester == $semester && 
+                    $score->subject->class_level == $kelas && 
+                    $this->matchYear($score->year, $year)) {
                     if ($score->isComplete()) {
                         $nilaiAkhir[] =
                             ($score->attendance * 0.10) +
@@ -300,6 +349,7 @@ class ScoreController extends Controller
                 'siswa' => $siswa,
                 'kelas' => $kelas,
                 'semester' => $semester,
+                'year' => $year,
                 'avg' => $avg,
             ];
         }
@@ -310,8 +360,12 @@ class ScoreController extends Controller
 
         $availableClasses = ['X', 'XI', 'XII'];
         $availableSemesters = ['ganjil' => 'Ganjil', 'genap' => 'Genap'];
+        $availableYears = StudentProgress::where('class_level', $kelas)
+            ->where('semester', $semester)
+            ->orderByDesc('year')
+            ->pluck('year')->unique();
 
-        return view('scores.rekap', compact('rekap', 'kelas', 'semester', 'availableClasses', 'availableSemesters'));
+        return view('scores.rekap', compact('rekap', 'kelas', 'semester', 'year', 'availableClasses', 'availableSemesters', 'availableYears'));
     }
 
     /**
@@ -418,5 +472,56 @@ class ScoreController extends Controller
             'availableClasses' => $availableClasses,
             'availableSemesters' => $availableSemesters,
         ]);
+    }
+
+    public function rekapPdf(Request $request)
+    {
+        $kelas = $request->input('kelas', 'XII');
+        $semester = $request->input('semester', 'genap');
+        $year = $request->input('year');
+        if (!$year) {
+            $year = \App\Models\StudentProgress::where('class_level', $kelas)
+                ->where('semester', $semester)
+                ->orderByDesc('year')
+                ->value('year');
+        }
+        $progressSiswa = \App\Models\StudentProgress::where('class_level', $kelas)
+            ->where('semester', $semester)
+            ->where('year', $year)
+            ->pluck('student_id');
+        $students = \App\Models\Student::whereIn('id', $progressSiswa)
+            ->with(['user', 'scores.subject'])
+            ->get();
+        $rekap = [];
+        foreach ($students as $siswa) {
+            $nilaiAkhir = [];
+            foreach ($siswa->scores as $score) {
+                if ($score->semester == $semester && $score->subject->class_level == $kelas && $this->matchYear($score->year, $year)) {
+                    if ($score->isComplete()) {
+                        $nilaiAkhir[] =
+                            ($score->attendance * 0.10) +
+                            ($score->assignment * 0.20) +
+                            ($score->mid_exam * 0.30) +
+                            ($score->final_exam * 0.40);
+                    }
+                }
+            }
+            $avg = count($nilaiAkhir) ? round(array_sum($nilaiAkhir) / count($nilaiAkhir), 2) : 0;
+            $rekap[] = [
+                'siswa' => $siswa,
+                'kelas' => $kelas,
+                'semester' => $semester,
+                'year' => $year,
+                'avg' => $avg,
+            ];
+        }
+        usort($rekap, fn($a, $b) => $b['avg'] <=> $a['avg']);
+        foreach ($rekap as $i => &$row) {
+            $row['rank'] = $i + 1;
+        }
+        $safeYear = str_replace(['/', '\\'], '-', $year);
+        $filename = 'rekap-ranking-'.$kelas.'-'.$semester.'-'.$safeYear.'.pdf';
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('scores.rekap_pdf', compact('rekap', 'kelas', 'semester', 'year'));
+        return $pdf->stream($filename);
     }
 }

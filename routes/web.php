@@ -51,6 +51,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('scores/store-multi', [ScoreController::class, 'storeMulti'])->name('scores.store-multi');
     Route::resource('subject-users', StudentSubjectController::class);
     Route::get('/rekap-ranking', [ScoreController::class, 'rekap'])->name('scores.rekap');
+    Route::get('/rekap-ranking/pdf', [App\Http\Controllers\ScoreController::class, 'rekapPdf'])->name('scores.rekap.pdf');
     Route::resource('student-progresses', StudentProgressController::class);
     // Manajemen Homepage
     Route::resource('heroes', HeroController::class);

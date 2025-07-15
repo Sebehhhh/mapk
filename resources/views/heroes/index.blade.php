@@ -72,9 +72,6 @@
                     data-bs-target="#editHeroModal{{ $hero->id }}">
                     <span class="iconify" data-icon="mdi:pencil" data-width="18"></span> Edit
                   </button>
-                  <button class="btn btn-danger btn-sm" onclick="confirmDeleteHero({{ $hero->id }})">
-                    <span class="iconify" data-icon="mdi:delete" data-width="18"></span> Hapus
-                  </button>
                 </td>
               </tr>
               @endforeach
