@@ -90,10 +90,10 @@ class ScoreController extends Controller
         $validatedData = $request->validate([
             'student_id'   => 'required|exists:students,id',
             'subject_id'   => 'required|exists:subjects,id',
-            'attendance'   => 'required|integer|min:0|max:100',
-            'assignment'   => 'required|integer|min:0|max:100',
-            'mid_exam'     => 'required|integer|min:0|max:100',
-            'final_exam'   => 'required|integer|min:0|max:100',
+            'attendance'   => 'nullable|integer|min:0|max:100',
+            'assignment'   => 'nullable|integer|min:0|max:100',
+            'mid_exam'     => 'nullable|integer|min:0|max:100',
+            'final_exam'   => 'nullable|integer|min:0|max:100',
         ]);
 
         try {
@@ -134,15 +134,23 @@ class ScoreController extends Controller
         $year = date('Y');
 
         foreach ($request->scores as $subject_id => $nilai) {
-            // Validasi nilai per mapel
-            if (
-                !isset($nilai['attendance'], $nilai['assignment'], $nilai['mid_exam'], $nilai['final_exam']) ||
-                $nilai['attendance'] < 0 || $nilai['attendance'] > 100 ||
-                $nilai['assignment'] < 0 || $nilai['assignment'] > 100 ||
-                $nilai['mid_exam'] < 0 || $nilai['mid_exam'] > 100 ||
-                $nilai['final_exam'] < 0 || $nilai['final_exam'] > 100
-            ) {
-                continue; // Skip jika ada nilai tidak valid
+            // Validasi nilai per mapel - sekarang boleh kosong
+            $hasAnyValue = false;
+            
+            // Cek apakah ada nilai yang diisi
+            foreach (['attendance', 'assignment', 'mid_exam', 'final_exam'] as $field) {
+                if (isset($nilai[$field]) && $nilai[$field] !== '' && $nilai[$field] !== null) {
+                    $hasAnyValue = true;
+                    // Validasi range nilai
+                    if ($nilai[$field] < 0 || $nilai[$field] > 100) {
+                        continue 2; // Skip ke subject berikutnya
+                    }
+                }
+            }
+            
+            // Skip jika tidak ada nilai yang diisi
+            if (!$hasAnyValue) {
+                continue;
             }
 
             // Cek double entry
@@ -153,19 +161,22 @@ class ScoreController extends Controller
                 ->first();
             if ($exists) continue; // Skip jika sudah ada
 
-            Score::create([
+            // Prepare data dengan handling null values
+            $scoreData = [
                 'student_id' => $student_id,
                 'subject_id' => $subject_id,
                 'semester' => $semester,
                 'year' => $year,
-                'attendance' => $nilai['attendance'],
-                'assignment' => $nilai['assignment'],
-                'mid_exam' => $nilai['mid_exam'],
-                'final_exam' => $nilai['final_exam'],
-            ]);
+                'attendance' => isset($nilai['attendance']) && $nilai['attendance'] !== '' ? $nilai['attendance'] : null,
+                'assignment' => isset($nilai['assignment']) && $nilai['assignment'] !== '' ? $nilai['assignment'] : null,
+                'mid_exam' => isset($nilai['mid_exam']) && $nilai['mid_exam'] !== '' ? $nilai['mid_exam'] : null,
+                'final_exam' => isset($nilai['final_exam']) && $nilai['final_exam'] !== '' ? $nilai['final_exam'] : null,
+            ];
+
+            Score::create($scoreData);
         }
 
-        return redirect()->route('scores.index')->with('success', 'Nilai berhasil disimpan.');
+        return redirect()->route('scores.index')->with('success', 'Nilai berhasil disimpan. Nilai yang kosong akan tetap kosong dan bisa diisi kemudian.');
     }
 
     /**
@@ -176,10 +187,10 @@ class ScoreController extends Controller
         $validatedData = $request->validate([
             'student_id'   => 'required|exists:students,id',
             'subject_id'   => 'required|exists:subjects,id',
-            'attendance'   => 'required|integer|min:0|max:100',
-            'assignment'   => 'required|integer|min:0|max:100',
-            'mid_exam'     => 'required|integer|min:0|max:100',
-            'final_exam'   => 'required|integer|min:0|max:100',
+            'attendance'   => 'nullable|integer|min:0|max:100',
+            'assignment'   => 'nullable|integer|min:0|max:100',
+            'mid_exam'     => 'nullable|integer|min:0|max:100',
+            'final_exam'   => 'nullable|integer|min:0|max:100',
         ]);
 
         try {
@@ -198,7 +209,43 @@ class ScoreController extends Controller
                 return redirect()->back()->withInput()->with('error', 'Nilai untuk siswa, mata pelajaran, semester, dan tahun ini sudah ada.');
             }
 
-            $score->update($validatedData);
+            // Handle null values for empty inputs
+            $updateData = $validatedData;
+            foreach (['attendance', 'assignment', 'mid_exam', 'final_exam'] as $field) {
+                if (isset($updateData[$field]) && $updateData[$field] === '') {
+                    $updateData[$field] = null;
+                }
+            }
+            
+            $score->update($updateData);
+            return redirect()->route('scores.index')->with('success', 'Nilai berhasil diperbarui!');
+        } catch (\Exception $e) {
+            return redirect()->back()->withInput()->with('error', 'Gagal memperbarui nilai: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Update partial scores (untuk update nilai yang belum lengkap).
+     */
+    public function updatePartial(Request $request, Score $score)
+    {
+        $validatedData = $request->validate([
+            'attendance'   => 'nullable|integer|min:0|max:100',
+            'assignment'   => 'nullable|integer|min:0|max:100',
+            'mid_exam'     => 'nullable|integer|min:0|max:100',
+            'final_exam'   => 'nullable|integer|min:0|max:100',
+        ]);
+
+        try {
+            // Handle null values for empty inputs
+            $updateData = [];
+            foreach (['attendance', 'assignment', 'mid_exam', 'final_exam'] as $field) {
+                if (isset($validatedData[$field])) {
+                    $updateData[$field] = $validatedData[$field] === '' ? null : $validatedData[$field];
+                }
+            }
+            
+            $score->update($updateData);
             return redirect()->route('scores.index')->with('success', 'Nilai berhasil diperbarui!');
         } catch (\Exception $e) {
             return redirect()->back()->withInput()->with('error', 'Gagal memperbarui nilai: ' . $e->getMessage());
@@ -238,11 +285,14 @@ class ScoreController extends Controller
             $nilaiAkhir = [];
             foreach ($siswa->scores as $score) {
                 if ($score->semester == $semester && $score->subject->class_level == $kelas) {
-                    $nilaiAkhir[] =
-                        ($score->attendance * 0.10) +
-                        ($score->assignment * 0.20) +
-                        ($score->mid_exam * 0.30) +
-                        ($score->final_exam * 0.40);
+                    // Hanya hitung jika semua nilai sudah diisi
+                    if ($score->isComplete()) {
+                        $nilaiAkhir[] =
+                            ($score->attendance * 0.10) +
+                            ($score->assignment * 0.20) +
+                            ($score->mid_exam * 0.30) +
+                            ($score->final_exam * 0.40);
+                    }
                 }
             }
             $avg = count($nilaiAkhir) ? round(array_sum($nilaiAkhir) / count($nilaiAkhir), 2) : 0;
@@ -291,16 +341,25 @@ class ScoreController extends Controller
             ->values();
 
         foreach ($scores as $score) {
-            $score->nilai_akhir = round(
-                ($score->attendance * 0.10) +
-                    ($score->assignment * 0.20) +
-                    ($score->mid_exam * 0.30) +
-                    ($score->final_exam * 0.40),
-                1
-            );
+            // Hanya hitung nilai akhir jika semua nilai sudah diisi
+            if ($score->isComplete()) {
+                $score->nilai_akhir = round(
+                    ($score->attendance * 0.10) +
+                        ($score->assignment * 0.20) +
+                        ($score->mid_exam * 0.30) +
+                        ($score->final_exam * 0.40),
+                    1
+                );
+            } else {
+                $score->nilai_akhir = null; // Belum lengkap
+            }
         }
 
-        $nilai_akhir_rata2 = $scores->count() > 0 ? round($scores->avg('nilai_akhir'), 2) : 0;
+        // Hitung rata-rata hanya dari nilai yang sudah lengkap
+        $completedScores = $scores->filter(function ($score) {
+            return $score->nilai_akhir !== null;
+        });
+        $nilai_akhir_rata2 = $completedScores->count() > 0 ? round($completedScores->avg('nilai_akhir'), 2) : 0;
 
         // Ranking
         $allStudents = Student::whereHas('scores', function ($q) use ($filterKelas, $filterSemester) {
@@ -317,10 +376,16 @@ class ScoreController extends Controller
                 ->where('subject.class_level', $filterKelas);
 
             $nilaiAkhir = $studentScores->map(function ($score) {
-                return ($score->attendance * 0.10) +
-                    ($score->assignment * 0.20) +
-                    ($score->mid_exam * 0.30) +
-                    ($score->final_exam * 0.40);
+                // Hanya hitung jika semua nilai sudah diisi
+                if ($score->isComplete()) {
+                    return ($score->attendance * 0.10) +
+                        ($score->assignment * 0.20) +
+                        ($score->mid_exam * 0.30) +
+                        ($score->final_exam * 0.40);
+                }
+                return null; // Jika belum lengkap
+            })->filter(function ($nilai) {
+                return $nilai !== null; // Filter out null values
             });
 
             $avg = $nilaiAkhir->count() ? round($nilaiAkhir->avg(), 2) : 0;

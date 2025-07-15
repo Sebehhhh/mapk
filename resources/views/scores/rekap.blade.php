@@ -42,7 +42,22 @@
                         <td>{{ $row['kelas'] }}</td>
                         <td>{{ ucfirst($row['semester']) }}</td>
                         <td>{{ $row['avg'] }}</td>
-                        <td><span class="badge bg-success fs-6">{{ $row['rank'] }}</span></td>
+                        <td>
+                            @php
+                                $allComplete = true;
+                                foreach ($row['siswa']->scores as $score) {
+                                    if ($score->semester == $row['semester'] && $score->subject->class_level == $row['kelas'] && !$score->isComplete()) {
+                                        $allComplete = false;
+                                        break;
+                                    }
+                                }
+                            @endphp
+                            @if($allComplete && $row['avg'] > 0)
+                                <span class="badge bg-success fs-6">{{ $row['rank'] }}</span>
+                            @else
+                                <span class="badge bg-warning text-dark fs-6">Belum Lengkap</span>
+                            @endif
+                        </td>
                     </tr>
                     @endforeach
                 </tbody>

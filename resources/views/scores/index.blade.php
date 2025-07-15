@@ -102,6 +102,11 @@
                 </span>
               </div>
 
+              <div class="alert alert-info mb-3">
+                <i class="fas fa-info-circle"></i>
+                <strong>Informasi:</strong> Anda dapat mengisi nilai secara bertahap. Nilai yang kosong akan disimpan sebagai kosong dan dapat diisi kemudian. Misalnya, jika UTS sudah selesai tapi UAS belum, Anda cukup mengisi nilai UTS saja.
+              </div>
+
 
 
               <div class="table-responsive">
@@ -126,19 +131,19 @@
                       <td>{{ $mapel->class_level }}</td>
                       <td>
                         <input type="number" name="scores[{{ $mapel->id }}][attendance]" min="0" max="100"
-                          class="form-control" required>
+                          class="form-control">
                       </td>
                       <td>
                         <input type="number" name="scores[{{ $mapel->id }}][assignment]" min="0" max="100"
-                          class="form-control" required>
+                          class="form-control">
                       </td>
                       <td>
                         <input type="number" name="scores[{{ $mapel->id }}][mid_exam]" min="0" max="100"
-                          class="form-control" required>
+                          class="form-control">
                       </td>
                       <td>
                         <input type="number" name="scores[{{ $mapel->id }}][final_exam]" min="0" max="100"
-                          class="form-control" required>
+                          class="form-control">
                       </td>
                     </tr>
                     @empty
@@ -229,13 +234,14 @@
           <label for="student_id_pick" class="form-label">Nama Siswa</label>
           <select name="student_id" class="form-select" id="student_id_pick" required>
             <option value="">Pilih Siswa</option>
-            @foreach($students as $student)
-            @if(request('class_level') == '' || $student->class == request('class_level'))
-            <option value="{{ $student->id }}" {{ request('student_id')==$student->id ? 'selected' : '' }}>
-              {{ $student->user->name ?? 'N/A' }} ({{ $student->nisn }})
-            </option>
-            @endif
-            @endforeach
+            @php $filteredStudents = $students->filter(fn($s) => request('class_level') == '' || $s->class == request('class_level')); @endphp
+            @forelse($filteredStudents as $student)
+              <option value="{{ $student->id }}" {{ request('student_id')==$student->id ? 'selected' : '' }}>
+                {{ $student->user->name ?? 'N/A' }} ({{ $student->nisn }})
+              </option>
+            @empty
+              <option value="" disabled>Tidak ada siswa di kelas ini</option>
+            @endforelse
           </select>
         </div>
         <div class="mb-3">
@@ -273,23 +279,19 @@
 
         <div class="mb-3">
           <label class="form-label">Kehadiran (%)</label>
-          <input type="number" name="attendance" class="form-control" value="{{ $score->attendance }}" min="0" max="100"
-            required>
+          <input type="number" name="attendance" class="form-control" value="{{ $score->attendance }}" min="0" max="100">
         </div>
         <div class="mb-3">
           <label class="form-label">Nilai Tugas</label>
-          <input type="number" name="assignment" class="form-control" value="{{ $score->assignment }}" min="0" max="100"
-            required>
+          <input type="number" name="assignment" class="form-control" value="{{ $score->assignment }}" min="0" max="100">
         </div>
         <div class="mb-3">
           <label class="form-label">Nilai UTS</label>
-          <input type="number" name="mid_exam" class="form-control" value="{{ $score->mid_exam }}" min="0" max="100"
-            required>
+          <input type="number" name="mid_exam" class="form-control" value="{{ $score->mid_exam }}" min="0" max="100">
         </div>
         <div class="mb-3">
           <label class="form-label">Nilai UAS</label>
-          <input type="number" name="final_exam" class="form-control" value="{{ $score->final_exam }}" min="0" max="100"
-            required>
+          <input type="number" name="final_exam" class="form-control" value="{{ $score->final_exam }}" min="0" max="100">
         </div>
       </div>
       <div class="modal-footer">

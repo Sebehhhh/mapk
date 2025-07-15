@@ -63,7 +63,20 @@
                     </div>
                     <div class="d-flex justify-content-between mt-2">
                         <span>Rangking</span>
-                        <span class="fw-bold">{{ $ranking ?? '-' }}</span>
+                        @php
+                          $allComplete = true;
+                          foreach ($scores as $score) {
+                            if (!$score->isComplete()) {
+                              $allComplete = false;
+                              break;
+                            }
+                          }
+                        @endphp
+                        @if($allComplete && $scores->count() > 0)
+                          <span class="fw-bold">{{ $ranking ?? '-' }}</span>
+                        @else
+                          <span class="badge bg-warning text-dark">Belum Lengkap</span>
+                        @endif
                     </div>
                 </div>
             </div>

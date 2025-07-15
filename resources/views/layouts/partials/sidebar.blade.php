@@ -78,7 +78,7 @@
             </li>
             <li>
               <a class="sidebar-link" href="{{ route('pengumuman.index') }}">
-                <i class="ti ti-megaphone"></i> Pengumuman
+                <i class="ti ti-bell"></i> Pengumuman
               </a>
             </li>
             <li>
