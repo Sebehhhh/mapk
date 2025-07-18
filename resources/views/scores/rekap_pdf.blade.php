@@ -17,7 +17,9 @@
 </head>
 <body>
     <div class="header">
-        <img src="{{ public_path('assets/images/logos/logo.png') }}" alt="Logo" />
+        @if(file_exists(public_path('assets/images/logos/logo.png')))
+            <img src="{{ public_path('assets/images/logos/logo.png') }}" alt="Logo" />
+        @endif
         <div class="title">REKAP RANKING SISWA</div>
         <div class="subtitle">Kelas {{ $kelas }} | Semester {{ ucfirst($semester) }} | Tahun {{ $year }}</div>
     </div>
@@ -36,7 +38,46 @@
                 <td>{{ $i + 1 }}</td>
                 <td class="text-left">{{ $row['siswa']->user->name ?? '-' }}</td>
                 <td>{{ $row['avg'] }}</td>
-                <td>{{ $row['rank'] }}</td>
+                <td>
+                    @php
+                        $allComplete = true;
+                        $hasScores = false;
+                        
+                        // Helper function to match year formats
+                        $matchYear = function($scoreYear, $progressYear) {
+                            if ($scoreYear == $progressYear) return true;
+                            if (strpos($progressYear, '/') !== false) {
+                                return $scoreYear == substr($progressYear, -4);
+                            }
+                            if (strpos($scoreYear, '/') !== false) {
+                                return substr($scoreYear, -4) == $progressYear;
+                            }
+                            return false;
+                        };
+                        
+                        foreach ($row['siswa']->scores as $score) {
+                            if ($score->semester == $row['semester'] && 
+                                $score->subject->class_level == $row['kelas'] && 
+                                $matchYear($score->year, $row['year'])) {
+                                $hasScores = true;
+                                if (!$score->isComplete()) {
+                                    $allComplete = false;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        // If no scores found, consider not complete
+                        if (!$hasScores) {
+                            $allComplete = false;
+                        }
+                    @endphp
+                    @if($allComplete && $row['avg'] > 0)
+                        {{ $row['rank'] }}
+                    @else
+                        Belum Lengkap
+                    @endif
+                </td>
             </tr>
             @endforeach
         </tbody>

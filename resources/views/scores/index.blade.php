@@ -177,6 +177,7 @@
                 <th>Tugas</th>
                 <th>UTS</th>
                 <th>UAS</th>
+                <th>Nilai Akhir</th>
                 <th>Aksi</th>
               </tr>
             </thead>
@@ -193,6 +194,13 @@
                 <td>{{ $score->mid_exam }}</td>
                 <td>{{ $score->final_exam }}</td>
                 <td>
+                  @if($score->isComplete())
+                    <span class="badge bg-success">{{ $score->final_score }}</span>
+                  @else
+                    <span class="badge bg-secondary">-</span>
+                  @endif
+                </td>
+                <td>
                   <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
                     data-bs-target="#editScoreModal{{ $score->id }}">Edit</button>
                   <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ $score->id }})">Hapus</button>
@@ -200,7 +208,7 @@
               </tr>
               @empty
               <tr>
-                <td colspan="12" class="text-center">Tidak ada data nilai siswa.</td>
+                <td colspan="11" class="text-center">Tidak ada data nilai siswa.</td>
               </tr>
               @endforelse
             </tbody>

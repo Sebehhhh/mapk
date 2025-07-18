@@ -476,52 +476,75 @@ class ScoreController extends Controller
 
     public function rekapPdf(Request $request)
     {
-        $kelas = $request->input('kelas', 'XII');
-        $semester = $request->input('semester', 'genap');
-        $year = $request->input('year');
-        if (!$year) {
-            $year = \App\Models\StudentProgress::where('class_level', $kelas)
+        try {
+            $kelas = $request->input('kelas', 'XII');
+            $semester = $request->input('semester', 'genap');
+            $year = $request->input('year');
+            
+            if (!$year) {
+                $year = \App\Models\StudentProgress::where('class_level', $kelas)
+                    ->where('semester', $semester)
+                    ->orderByDesc('year')
+                    ->value('year');
+            }
+            
+            if (!$year) {
+                return redirect()->back()->with('error', 'Tidak ada data tahun ajaran untuk kelas dan semester ini.');
+            }
+            
+            $progressSiswa = \App\Models\StudentProgress::where('class_level', $kelas)
                 ->where('semester', $semester)
-                ->orderByDesc('year')
-                ->value('year');
-        }
-        $progressSiswa = \App\Models\StudentProgress::where('class_level', $kelas)
-            ->where('semester', $semester)
-            ->where('year', $year)
-            ->pluck('student_id');
-        $students = \App\Models\Student::whereIn('id', $progressSiswa)
-            ->with(['user', 'scores.subject'])
-            ->get();
-        $rekap = [];
-        foreach ($students as $siswa) {
-            $nilaiAkhir = [];
-            foreach ($siswa->scores as $score) {
-                if ($score->semester == $semester && $score->subject->class_level == $kelas && $this->matchYear($score->year, $year)) {
-                    if ($score->isComplete()) {
-                        $nilaiAkhir[] =
-                            ($score->attendance * 0.10) +
-                            ($score->assignment * 0.20) +
-                            ($score->mid_exam * 0.30) +
-                            ($score->final_exam * 0.40);
+                ->where('year', $year)
+                ->pluck('student_id');
+                
+            if ($progressSiswa->isEmpty()) {
+                return redirect()->back()->with('error', 'Tidak ada data siswa untuk kelas, semester, dan tahun ini.');
+            }
+            
+            $students = \App\Models\Student::whereIn('id', $progressSiswa)
+                ->with(['user', 'scores.subject'])
+                ->get();
+                
+            $rekap = [];
+            foreach ($students as $siswa) {
+                $nilaiAkhir = [];
+                foreach ($siswa->scores as $score) {
+                    if ($score->semester == $semester && 
+                        $score->subject->class_level == $kelas && 
+                        $this->matchYear($score->year, $year)) {
+                        if ($score->isComplete()) {
+                            $nilaiAkhir[] =
+                                ($score->attendance * 0.10) +
+                                ($score->assignment * 0.20) +
+                                ($score->mid_exam * 0.30) +
+                                ($score->final_exam * 0.40);
+                        }
                     }
                 }
+                $avg = count($nilaiAkhir) ? round(array_sum($nilaiAkhir) / count($nilaiAkhir), 2) : 0;
+                $rekap[] = [
+                    'siswa' => $siswa,
+                    'kelas' => $kelas,
+                    'semester' => $semester,
+                    'year' => $year,
+                    'avg' => $avg,
+                ];
             }
-            $avg = count($nilaiAkhir) ? round(array_sum($nilaiAkhir) / count($nilaiAkhir), 2) : 0;
-            $rekap[] = [
-                'siswa' => $siswa,
-                'kelas' => $kelas,
-                'semester' => $semester,
-                'year' => $year,
-                'avg' => $avg,
-            ];
+            
+            usort($rekap, fn($a, $b) => $b['avg'] <=> $a['avg']);
+            foreach ($rekap as $i => &$row) {
+                $row['rank'] = $i + 1;
+            }
+            
+            $safeYear = str_replace(['/', '\\'], '-', $year);
+            $filename = 'rekap-ranking-'.$kelas.'-'.$semester.'-'.$safeYear.'.pdf';
+            
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('scores.rekap_pdf', compact('rekap', 'kelas', 'semester', 'year'));
+            $pdf->setPaper('A4', 'portrait');
+            
+            return $pdf->stream($filename);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal mencetak PDF: ' . $e->getMessage());
         }
-        usort($rekap, fn($a, $b) => $b['avg'] <=> $a['avg']);
-        foreach ($rekap as $i => &$row) {
-            $row['rank'] = $i + 1;
-        }
-        $safeYear = str_replace(['/', '\\'], '-', $year);
-        $filename = 'rekap-ranking-'.$kelas.'-'.$semester.'-'.$safeYear.'.pdf';
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('scores.rekap_pdf', compact('rekap', 'kelas', 'semester', 'year'));
-        return $pdf->stream($filename);
     }
 }
